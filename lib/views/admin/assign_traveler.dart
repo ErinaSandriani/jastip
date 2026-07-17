@@ -46,7 +46,7 @@ class _AssignTravelerPageState
 
           .read<TravelerViewModel>()
 
-          .getTraveler();
+          .getAllTravelers();
     });
   }
 

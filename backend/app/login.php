@@ -12,86 +12,149 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 include "db.php";
 
-// Ambil data dari JSON (API)
 $data = json_decode(
     file_get_contents("php://input"),
     true
 );
 
-// Ambil juga dari POST
 $email =
-    $_POST['email']
-    ?? ($data['email'] ?? null);
+    $_POST["email"]
+    ?? ($data["email"] ?? "");
 
 $password =
-    $_POST['password']
-    ?? ($data['password'] ?? null);
+    $_POST["password"]
+    ?? ($data["password"] ?? "");
 
-// Validasi input
-if (
-    !$email ||
-    !$password
-) {
+if (empty($email) || empty($password)) {
 
     echo json_encode([
-
         "status" => "error",
-
-        "message" =>
-            "Email dan password wajib diisi"
+        "message" => "Email dan password wajib diisi."
     ]);
 
     exit;
 }
 
-// Query database
-$sql =
-    "SELECT * FROM users
-     WHERE email='$email'
-     AND password='$password'";
+$stmt = $conn->prepare(
 
-$result =
-    $conn->query($sql);
+"SELECT * FROM users
 
-// Cek hasil login
-if (
-    $result &&
-    $result->num_rows > 0
-) {
+WHERE email=?"
 
-    $user =
-        $result->fetch_assoc();
+);
+
+$stmt->bind_param("s",$email);
+
+$stmt->execute();
+
+$result = $stmt->get_result();
+
+if($result->num_rows==0){
 
     echo json_encode([
 
-        "status" => "success",
+        "status"=>"error",
 
-        "role" => $user['role'],
-
-        "user" => [
-
-            "id" =>
-                $user['id'],
-
-            "nama" =>
-                $user['nama'],
-
-            "email" =>
-                $user['email'],
-
-            "role" =>
-                $user['role']
-        ]
+        "message"=>"Email tidak ditemukan."
     ]);
 
-} else {
-
-    echo json_encode([
-
-        "status" => "error",
-
-        "message" =>
-            "Login gagal"
-    ]);
+    exit;
 }
-?>
+
+$user = $result->fetch_assoc();
+
+$passwordBenar = false;
+
+/*
+|--------------------------------------------------------------------------
+| Support akun lama (plain text)
+|--------------------------------------------------------------------------
+*/
+
+if($user["password"] == $password){
+
+    $passwordBenar = true;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Support akun baru (password_hash)
+|--------------------------------------------------------------------------
+*/
+
+if(password_verify(
+    $password,
+    $user["password"]
+)){
+
+    $passwordBenar = true;
+}
+
+if(!$passwordBenar){
+
+    echo json_encode([
+
+        "status"=>"error",
+
+        "message"=>"Password salah."
+    ]);
+
+    exit;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Traveler harus approved
+|--------------------------------------------------------------------------
+*/
+
+if($user["role"]=="traveler"){
+
+    if($user["status_verifikasi"]=="pending"){
+
+        echo json_encode([
+
+            "status"=>"error",
+
+            "message"=>"Akun Traveler masih menunggu persetujuan Admin."
+        ]);
+
+        exit;
+    }
+
+    if($user["status_verifikasi"]=="rejected"){
+
+        echo json_encode([
+
+            "status"=>"error",
+
+            "message"=>"Pendaftaran Traveler ditolak Admin."
+        ]);
+
+        exit;
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
+| Login Success
+|--------------------------------------------------------------------------
+*/
+
+echo json_encode([
+
+    "status"=>"success",
+
+    "role"=>$user["role"],
+
+    "user"=>[
+
+        "id"=>$user["id"],
+
+        "nama"=>$user["nama"],
+
+        "email"=>$user["email"],
+
+        "role"=>$user["role"]
+    ]
+]);

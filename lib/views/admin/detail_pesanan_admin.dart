@@ -2,10 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../models/pesanan_model.dart';
 
-import 'assign_traveler.dart';
-
-class DetailPesananAdmin
-    extends StatelessWidget {
+class DetailPesananAdmin extends StatelessWidget {
 
   final Pesanan pesanan;
 
@@ -16,46 +13,111 @@ class DetailPesananAdmin
     required this.pesanan,
   });
 
-  Widget buildItem({
+  Color getStatusColor(String status){
+
+    switch(status){
+
+      case "Pending":
+        return Colors.orange;
+
+      case "Dibeli":
+        return Colors.blue;
+
+      case "Dalam Perjalanan":
+        return Colors.purple;
+
+      case "Dikirim":
+        return Colors.indigo;
+
+      case "Selesai":
+        return Colors.green;
+
+      default:
+        return Colors.grey;
+    }
+  }
+
+  Widget infoTile({
+
+    required IconData icon,
 
     required String title,
 
     required String value,
-  }) {
+
+  }){
 
     return Padding(
 
-      padding:
-          const EdgeInsets.only(
-        bottom: 16,
-      ),
+      padding: const EdgeInsets.only(bottom:18),
 
-      child: Column(
+      child: Row(
 
         crossAxisAlignment:
             CrossAxisAlignment.start,
 
         children: [
 
-          Text(
+          CircleAvatar(
 
-            title,
+            radius:20,
 
-            style: const TextStyle(
+            backgroundColor:
+                const Color(0xffFDECEC),
 
-              fontWeight:
-                  FontWeight.bold,
+            child: Icon(
 
-              color: Colors.grey,
+              icon,
+
+              color:
+                  const Color(0xffB71C1C),
+
+              size:20,
             ),
           ),
 
-          const SizedBox(
-            height: 4,
-          ),
+          const SizedBox(width:14),
 
-          Text(
-            value,
+          Expanded(
+
+            child: Column(
+
+              crossAxisAlignment:
+                  CrossAxisAlignment.start,
+
+              children: [
+
+                Text(
+
+                  title,
+
+                  style: const TextStyle(
+
+                    color: Colors.grey,
+
+                    fontSize:13,
+                  ),
+                ),
+
+                const SizedBox(height:3),
+
+                Text(
+
+                  value.isEmpty
+                      ? "-"
+
+                      : value,
+
+                  style: const TextStyle(
+
+                    fontSize:16,
+
+                    fontWeight:
+                        FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -63,170 +125,439 @@ class DetailPesananAdmin
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context){
 
     return Scaffold(
 
+      backgroundColor:
+          const Color(0xffF5F5F5),
+
       appBar: AppBar(
 
+        elevation:0,
+
+        backgroundColor:
+            Colors.white,
+
+        foregroundColor:
+            Colors.black,
+
+        centerTitle:true,
+
         title: const Text(
+
           "Detail Pesanan",
+
+          style: TextStyle(
+
+            fontWeight:
+                FontWeight.bold,
+          ),
         ),
       ),
 
       body: SingleChildScrollView(
 
         padding:
-            const EdgeInsets.all(
-          16,
-        ),
+            const EdgeInsets.all(20),
 
         child: Column(
 
-          crossAxisAlignment:
-              CrossAxisAlignment.start,
-
           children: [
-
-            buildItem(
-
-              title:
-                  "Kategori Barang",
-
-              value:
-                  pesanan.namaBarang,
-            ),
-
-            buildItem(
-
-              title:
-                  "Detail Barang",
-
-              value:
-                  pesanan.notes,
-            ),
-
-            buildItem(
-
-              title:
-                  "Status",
-
-              value:
-                  pesanan.status,
-            ),
-
-            buildItem(
-
-              title:
-                  "Traveler",
-
-              value: pesanan
-                      .namaTraveler
-                      .isEmpty
-
-                  ? "Belum dipilih"
-
-                  : pesanan
-                      .namaTraveler,
-            ),
-
-            buildItem(
-
-              title:
-                  "Estimasi Kepulangan",
-
-              value: pesanan
-                  .tanggalKepulangan,
-            ),
-
-            const SizedBox(
-              height: 20,
-            ),
-
-            const Text(
-
-              "Bukti DP",
-
-              style: TextStyle(
-
-                fontSize: 18,
-
-                fontWeight:
-                    FontWeight.bold,
-              ),
-            ),
-
-            const SizedBox(
-              height: 12,
-            ),
 
             Container(
 
-              height: 200,
-
               width: double.infinity,
+
+              padding:
+                  const EdgeInsets.all(22),
 
               decoration: BoxDecoration(
 
                 borderRadius:
-                    BorderRadius.circular(
-                  12,
-                ),
+                    BorderRadius.circular(22),
 
-                color:
-                    Colors.grey.shade300,
+                gradient:
+                    const LinearGradient(
+
+                  colors: [
+
+                    Color(0xffE53935),
+
+                    Color(0xff8E0000),
+                  ],
+                ),
               ),
 
-              child: const Center(
+              child: Column(
 
-                child: Text(
-                  "Preview Bukti DP",
-                ),
-              ),
-            ),
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
 
-            const SizedBox(
-              height: 30,
-            ),
+                children: [
 
-            SizedBox(
+                  Row(
 
-              width:
-                  double.infinity,
+                    children: [
 
-              height: 50,
+                      const CircleAvatar(
 
-              child:
-                  ElevatedButton.icon(
+                        radius:26,
 
-                onPressed: () {
+                        backgroundColor:
+                            Colors.white,
 
-                  Navigator.push(
+                        child: Icon(
 
-                    context,
+                          Icons.shopping_bag,
 
-                    MaterialPageRoute(
+                          color:
+                              Color(0xffB71C1C),
+                        ),
+                      ),
 
-                      builder:
-                          (_) =>
-                              AssignTravelerPage(
+                      const SizedBox(width:14),
 
-                        pesanan:
-                            pesanan,
+                      Expanded(
+
+                        child: Text(
+
+                          pesanan.namaBarang,
+
+                          style:
+                              const TextStyle(
+
+                            color:
+                                Colors.white,
+
+                            fontSize:22,
+
+                            fontWeight:
+                                FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height:20),
+
+                  Container(
+
+                    padding:
+                        const EdgeInsets.symmetric(
+
+                      horizontal:14,
+
+                      vertical:8,
+                    ),
+
+                    decoration: BoxDecoration(
+
+                      color:
+                          getStatusColor(
+                            pesanan.status,
+                          ),
+
+                      borderRadius:
+                          BorderRadius.circular(
+                        20,
                       ),
                     ),
-                  );
-                },
 
-                icon: const Icon(
-                  Icons.flight,
-                ),
+                    child: Text(
 
-                label: const Text(
-                  "Assign Traveler",
-                ),
+                      pesanan.status,
+
+                      style:
+                          const TextStyle(
+
+                        color: Colors.white,
+
+                        fontWeight:
+                            FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
+
+            const SizedBox(height: 24),
+
+            Container(
+
+              width: double.infinity,
+
+              padding: const EdgeInsets.all(20),
+
+              decoration: BoxDecoration(
+
+                color: Colors.white,
+
+                borderRadius:
+                    BorderRadius.circular(20),
+
+                boxShadow: [
+
+                  BoxShadow(
+
+                    color:
+                        Colors.black.withOpacity(.05),
+
+                    blurRadius: 10,
+
+                    offset:
+                        const Offset(0,4),
+                  ),
+                ],
+              ),
+
+              child: Column(
+
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
+
+                children: [
+
+                  const Text(
+
+                    "Informasi Pesanan",
+
+                    style: TextStyle(
+
+                      fontSize:18,
+
+                      fontWeight:
+                          FontWeight.bold,
+                    ),
+                  ),
+
+                  const SizedBox(height:20),
+
+                  infoTile(
+
+                    icon: Icons.category,
+
+                    title: "Kategori Barang",
+
+                    value: pesanan.namaBarang,
+                  ),
+
+                  infoTile(
+
+                    icon: Icons.notes,
+
+                    title: "Detail Barang",
+
+                    value: pesanan.notes,
+                  ),
+
+                  infoTile(
+
+                    icon: Icons.person,
+
+                    title: "Customer",
+
+                    value: pesanan.customerNama,
+                  ),
+
+                  infoTile(
+
+                    icon: Icons.flight_takeoff,
+
+                    title: "Traveler",
+
+                    value: pesanan.namaTraveler.isEmpty
+
+                        ? "Belum dipilih"
+
+                        : pesanan.namaTraveler,
+                  ),
+
+                  infoTile(
+
+                    icon: Icons.calendar_month,
+
+                    title: "Estimasi Kepulangan",
+
+                    value: pesanan.tanggalKepulangan,
+                  ),
+
+                  infoTile(
+
+                    icon: Icons.location_on,
+
+                    title: "Alamat Pengiriman",
+
+                    value: pesanan.alamat,
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height:24),
+
+            Container(
+
+              width: double.infinity,
+
+              padding: const EdgeInsets.all(20),
+
+              decoration: BoxDecoration(
+
+                color: Colors.white,
+
+                borderRadius:
+                    BorderRadius.circular(20),
+
+                boxShadow: [
+
+                  BoxShadow(
+
+                    color:
+                        Colors.black.withOpacity(.05),
+
+                    blurRadius:10,
+
+                    offset:
+                        const Offset(0,4),
+                  ),
+                ],
+              ),
+
+              child: Column(
+
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
+
+                children: [
+
+                  const Text(
+
+                    "Bukti Pembayaran DP",
+
+                    style: TextStyle(
+
+                      fontSize:18,
+
+                      fontWeight:
+                          FontWeight.bold,
+                    ),
+                  ),
+
+                  const SizedBox(height:18),
+
+                  ClipRRect(
+
+                    borderRadius:
+                        BorderRadius.circular(16),
+
+                    child: Container(
+
+                      width: double.infinity,
+
+                      height:220,
+
+                      color:
+                          Colors.grey.shade200,
+
+                      child: const Column(
+
+                        mainAxisAlignment:
+                            MainAxisAlignment.center,
+
+                        children: [
+
+                          Icon(
+
+                            Icons.image,
+
+                            size:60,
+
+                            color: Colors.grey,
+                          ),
+
+                          SizedBox(height:12),
+
+                          Text(
+
+                            "Preview Bukti Transfer",
+
+                            style: TextStyle(
+
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height:30),
+
+SizedBox(
+
+  width: double.infinity,
+
+  height: 54,
+
+  child: ElevatedButton.icon(
+
+    style: ElevatedButton.styleFrom(
+
+      backgroundColor:
+          const Color(0xffB71C1C),
+
+      foregroundColor:
+          Colors.white,
+
+      shape:
+          RoundedRectangleBorder(
+
+        borderRadius:
+            BorderRadius.circular(16),
+      ),
+    ),
+
+    onPressed: () {
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
+
+        const SnackBar(
+
+          content: Text(
+
+            "Pesanan berhasil dikonfirmasi",
+          ),
+        ),
+      );
+    },
+
+    icon: const Icon(
+
+      Icons.verified,
+    ),
+
+    label: const Text(
+
+      "Konfirmasi Pesanan",
+
+      style: TextStyle(
+
+        fontSize:16,
+
+        fontWeight:
+            FontWeight.bold,
+      ),
+    ),
+  ),
+),
+            const SizedBox(height:20),
           ],
         ),
       ),

@@ -2,29 +2,34 @@
 
 header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Headers: Content-Type");
-header("Access-Control-Allow-Methods: GET");
 
 include "db.php";
 
-$sql = "
-SELECT
-    id,
-    nama,
-    email,
-    tanggal_pulang
+$sql = "SELECT
+
+id,
+
+nama,
+
+email,
+
+no_hp,
+
+alamat,
+
+tanggal_pulang,
+
+status_verifikasi
+
 FROM users
-WHERE role = 'traveler'
-AND status_verifikasi = 'approved'
-AND tanggal_pulang IS NOT NULL
-ORDER BY tanggal_pulang ASC
-";
+
+WHERE role='traveler'";
 
 $result = $conn->query($sql);
 
 $data = [];
 
-if ($result) {
+if ($result && $result->num_rows > 0) {
 
     while ($row = $result->fetch_assoc()) {
 
@@ -39,11 +44,7 @@ if ($result) {
 } else {
 
     echo json_encode([
-        "status" => "error",
-        "message" => $conn->error
+        "status" => "success",
+        "data" => []
     ]);
 }
-
-$conn->close();
-
-?>

@@ -13,7 +13,7 @@ class TravelerViewModel extends ChangeNotifier {
 
   TravelerModel? profileTraveler;
 
-  Future<void> getTraveler() async {
+  Future<void> getAllTravelers() async {
     isLoading = true;
     notifyListeners();
 
@@ -60,7 +60,7 @@ class TravelerViewModel extends ChangeNotifier {
       final data = jsonDecode(response.body);
 
       if (data["status"] == "success") {
-        await getTraveler();
+        await getAllTravelers();
         return true;
       }
     } catch (e) {
@@ -86,7 +86,7 @@ class TravelerViewModel extends ChangeNotifier {
       final data = jsonDecode(response.body);
 
       if (data["status"] == "success") {
-        await getTraveler();
+        await getAllTravelers();
         return true;
       }
     } catch (e) {
@@ -95,4 +95,75 @@ class TravelerViewModel extends ChangeNotifier {
 
     return false;
   }
+  Future<bool> approveTraveler(
+  int travelerId,
+) async {
+
+  try {
+
+    final response = await http.post(
+
+      Uri.parse(
+        "${ApiService.baseUrl}/approve_traveler.php",
+      ),
+
+      body: {
+
+        "id": travelerId.toString(),
+      },
+    );
+
+    final data = jsonDecode(response.body);
+
+    if(data["status"]=="success"){
+
+      await getAllTravelers();
+
+      return true;
+    }
+
+  } catch(e){
+
+    debugPrint(e.toString());
+
+  }
+
+  return false;
+}
+
+Future<bool> rejectTraveler(
+  int travelerId,
+) async {
+
+  try {
+
+    final response = await http.post(
+
+      Uri.parse(
+        "${ApiService.baseUrl}/reject_traveler.php",
+      ),
+
+      body: {
+
+        "id": travelerId.toString(),
+      },
+    );
+
+    final data = jsonDecode(response.body);
+
+    if(data["status"]=="success"){
+
+      await getAllTravelers();
+
+      return true;
+    }
+
+  } catch(e){
+
+    debugPrint(e.toString());
+
+  }
+
+  return false;
+}
 }

@@ -6,11 +6,21 @@ header("Access-Control-Allow-Origin: *");
 
 include "db.php";
 
-$sql = "SELECT id,nama,email
+$sql = "SELECT
 
-        FROM users
+id,
 
-        WHERE role='traveler'";
+nama,
+
+email,
+
+tanggal_pulang,
+
+status_verifikasi
+
+FROM users
+
+WHERE role='traveler'";
 
 $result = $conn->query($sql);
 

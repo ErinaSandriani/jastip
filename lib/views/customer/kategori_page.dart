@@ -22,7 +22,7 @@ class _KategoriPageState
     Future.microtask(() {
       context
           .read<TravelerViewModel>()
-          .getTraveler();
+          .getAllTravelers();
     });
   }
 

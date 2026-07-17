@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'register_traveler_page.dart';
 import 'login_page.dart';
 import 'register_page.dart';
 
@@ -156,48 +157,102 @@ class WelcomePage extends StatelessWidget {
               const SizedBox(height: 16),
 
               SizedBox(
-                width: double.infinity,
-                height: 56,
+  width: double.infinity,
+  height: 56,
 
-                child: OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: const Color(0xffB71C1C),
+  child: OutlinedButton(
+    style: OutlinedButton.styleFrom(
+      foregroundColor: const Color(0xffB71C1C),
 
-                    side: const BorderSide(
-                      color: Color(0xffB71C1C),
-                      width: 1.5,
-                    ),
+      side: const BorderSide(
+        color: Color(0xffB71C1C),
+        width: 1.5,
+      ),
 
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                  ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+    ),
 
-                  onPressed: () {
+    onPressed: () {
 
-                    Navigator.push(
+      Navigator.push(
 
-                      context,
+        context,
 
-                      MaterialPageRoute(
-                        builder: (_) =>
-                            const RegisterPage(),
-                      ),
-                    );
-                  },
+        MaterialPageRoute(
+          builder: (_) =>
+              const RegisterPage(),
+        ),
+      );
+    },
 
-                  child: const Text(
-                    "Create Account",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: .5,
-                    ),
-                  ),
-                ),
-              ),
+    child: const Text(
+      "Create Account",
+      style: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.bold,
+        letterSpacing: .5,
+      ),
+    ),
+  ),
+),
 
-              const SizedBox(height: 28),
+const SizedBox(height: 18),
+
+Row(
+
+  mainAxisAlignment: MainAxisAlignment.center,
+
+  children: [
+
+    const Text(
+
+      "Ingin menjadi Traveler?",
+
+      style: TextStyle(
+
+        color: Colors.black54,
+
+        fontSize: 14,
+      ),
+    ),
+
+    TextButton(
+
+  onPressed: () {
+
+    Navigator.push(
+
+      context,
+
+      MaterialPageRoute(
+
+        builder: (_) =>
+            const RegisterTravelerPage(),
+
+      ),
+
+    );
+
+  },
+
+      child: const Text(
+
+        "Daftar di sini",
+
+        style: TextStyle(
+
+          color: Color(0xffB71C1C),
+
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    ),
+  ],
+),
+
+const SizedBox(height: 28),
 
               Container(
                 width: 70,

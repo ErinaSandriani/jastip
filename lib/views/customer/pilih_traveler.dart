@@ -37,7 +37,7 @@ class _PilihTravelerPageState
 
           .read<TravelerViewModel>()
 
-          .getTraveler();
+          .getAllTravelers();
     });
   }
 

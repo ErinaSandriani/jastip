@@ -52,7 +52,7 @@ class _FormPesananPageState
 
       context
           .read<TravelerViewModel>()
-          .getTraveler();
+          .getAllTravelers();
 
     });
   }
