@@ -39,73 +39,84 @@ class _LoginPageState
 
       backgroundColor:
           const Color(0xffF8F8F8),
+          appBar: AppBar(
+  backgroundColor: const Color(0xffF8F8F8),
+  elevation: 0,
+  scrolledUnderElevation: 0,
+  foregroundColor: const Color(0xff212121),
+),  
 
-      appBar: AppBar(
-
-        backgroundColor: Colors.white,
-
-        elevation: 0,
-
-        centerTitle: true,
-
-        foregroundColor:
-            const Color(0xff212121),
-
-        title: const Text(
-
-          "Sign In",
-
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+      body: SafeArea(
+  child: SingleChildScrollView(
+    child: Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 24,
+        vertical: 24,
       ),
-
-      body: Padding(
-
-        padding:
-            const EdgeInsets.symmetric(
-
-          horizontal: 24,
-
-          vertical: 10,
-        ),
-
-        child: Column(
+      child: Column( 
 
           crossAxisAlignment:
               CrossAxisAlignment.start,
 
           children: [
 
-            const SizedBox(height: 10),
+Center(
+  child: Container(
+    width: 90,
+    height: 90,
+    decoration: BoxDecoration(
+      gradient: const LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          Color(0xff8B0000),
+          Color(0xffB71C1C),
+          Color(0xffD32F2F),
+        ],
+      ),
+      borderRadius: BorderRadius.circular(24),
+      boxShadow: [
+        BoxShadow(
+          color: const Color(0xffB71C1C).withOpacity(.25),
+          blurRadius: 18,
+          offset: const Offset(0, 8),
+        ),
+      ],
+    ),
+    child: const Icon(
+      Icons.shopping_bag_rounded,
+      color: Colors.white,
+      size: 45,
+    ),
+  ),
+),
 
-            const Text(
+const SizedBox(height: 24),
 
-              "Welcome Back",
+            const SizedBox(height: 30),
 
-              style: TextStyle(
-
-                fontSize: 28,
-
-                fontWeight:
-                    FontWeight.bold,
-              ),
-            ),
+            const Center(
+  child: Text(
+    "Welcome Back",
+    style: TextStyle(
+      fontSize: 30,
+      fontWeight: FontWeight.bold,
+    ),
+  ),
+),
 
             const SizedBox(height: 8),
 
-            const Text(
-
-              "Sign in to continue your\nKorean shopping journey.",
-
-              style: TextStyle(
-
-                color: Colors.black54,
-
-                height: 1.5,
-              ),
-            ),
+            const Center(
+  child: Text(
+    "Sign in to continue your\nKorean shopping journey.",
+    textAlign: TextAlign.center,
+    style: TextStyle(
+      color: Colors.black54,
+      height: 1.5,
+    ),
+  ),
+),
 
             const SizedBox(height: 35),
 
@@ -118,6 +129,10 @@ class _LoginPageState
                   InputDecoration(
 
                 labelText: "Email",
+                contentPadding:
+    const EdgeInsets.symmetric(
+      vertical: 18,
+    ),
 
                 prefixIcon:
                     const Icon(Icons.email),
@@ -152,6 +167,10 @@ class _LoginPageState
                   InputDecoration(
 
                 labelText: "Password",
+                contentPadding:
+    const EdgeInsets.symmetric(
+      vertical: 18,
+    ),
 
                 prefixIcon:
                     const Icon(Icons.lock),
@@ -187,7 +206,7 @@ class _LoginPageState
 
                     width: double.infinity,
 
-                    height: 55,
+                    height: 58,
 
                     child: ElevatedButton(
 
@@ -382,6 +401,8 @@ class _LoginPageState
             ),
           ],
         ),
+      ),
+  ),
       ),
     );
   }

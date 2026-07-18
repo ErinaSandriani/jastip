@@ -61,18 +61,11 @@ class _RegisterTravelerPageState
       backgroundColor: const Color(0xffF8F8F8),
 
       appBar: AppBar(
-
-        elevation: 0,
-
-        backgroundColor: Colors.transparent,
-
-        foregroundColor: Colors.black,
-
-        title: const Text(
-          "Daftar Traveler",
-        ),
-      ),
-
+  backgroundColor: const Color(0xffF8F8F8),
+  elevation: 0,
+  scrolledUnderElevation: 0,
+  foregroundColor: const Color(0xff212121),
+),
       body: SafeArea(
 
         child: SingleChildScrollView(
