@@ -1,41 +1,64 @@
 import 'package:flutter/material.dart';
 
+import 'package:provider/provider.dart';
+
+import '../../services/api_service.dart';
+
+import '../../viewmodels/pesanan_viewmodel.dart';
+
 import '../../models/pesanan_model.dart';
 
-class DetailPesananAdmin extends StatelessWidget {
+import 'konfirmasi_barang_page.dart';
 
+class DetailPesananAdmin extends StatefulWidget {
   final Pesanan pesanan;
 
   const DetailPesananAdmin({
-
     super.key,
-
     required this.pesanan,
   });
 
-  Color getStatusColor(String status){
+  @override
+  State<DetailPesananAdmin> createState() =>
+      _DetailPesananAdminState();
+}
 
-    switch(status){
+class _DetailPesananAdminState
+    extends State<DetailPesananAdmin> {
 
-      case "Pending":
-        return Colors.orange;
+  Color getStatusColor(String status) {
+  switch (status) {
+    case "Menunggu Konfirmasi Admin":
+      return Colors.orange;
 
-      case "Dibeli":
-        return Colors.blue;
+    case "Diproses":
+      return Colors.blue;
 
-      case "Dalam Perjalanan":
-        return Colors.purple;
+    case "On Hold":
+      return Colors.deepOrange;
 
-      case "Dikirim":
-        return Colors.indigo;
+    case "Tidak Ditemukan":
+      return Colors.red;
 
-      case "Selesai":
-        return Colors.green;
+    case "Dalam Pengiriman":
+      return Colors.purple;
 
-      default:
-        return Colors.grey;
-    }
+    case "Menunggu Pelunasan":
+      return Colors.teal;
+
+    case "Dikirim ke Rumah Customer":
+      return Colors.indigo;
+
+    case "Selesai":
+      return Colors.green;
+
+    case "Dibatalkan":
+      return Colors.grey;
+
+    default:
+      return Colors.grey;
   }
+}
 
   Widget infoTile({
 
@@ -123,6 +146,197 @@ class DetailPesananAdmin extends StatelessWidget {
       ),
     );
   }
+
+  Future<void> _updateStatus(String status) async {
+  final vm = context.read<PesananViewModel>();
+
+  final success = await vm.updateStatus(
+    widget.pesanan.id,
+    status,
+  );
+
+  if (!mounted) return;
+
+  if (success) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          "Status berhasil diubah menjadi $status",
+        ),
+      ),
+    );
+
+    Navigator.pop(context, true);
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          "Gagal mengubah status",
+        ),
+      ),
+    );
+  }
+}
+
+Future<void> _showConfirmDialog({
+  required String title,
+  required String message,
+  required String nextStatus,
+}) async {
+  final result = await showDialog<bool>(
+    context: context,
+    builder: (_) => AlertDialog(
+      title: Text(title),
+      content: Text(message),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context, false),
+          child: const Text("Batal"),
+        ),
+        ElevatedButton(
+          onPressed: () => Navigator.pop(context, true),
+          child: const Text("Ya"),
+        ),
+      ],
+    ),
+  );
+
+  if (result == true) {
+    await _updateStatus(nextStatus);
+  }
+}
+
+Widget buildActionButton() {
+  switch (widget.pesanan.status) {
+    case "Menunggu Konfirmasi Admin":
+    return Row(
+  children: [
+    Expanded(
+      child: OutlinedButton.icon(
+        icon: const Icon(Icons.cancel),
+        label: const Text("Batalkan"),
+        onPressed: () {
+          _showConfirmDialog(
+            title: "Batalkan Pesanan",
+            message:
+                "Yakin ingin membatalkan pesanan ini?",
+            nextStatus: "Dibatalkan",
+          );
+        },
+      ),
+    ),
+
+    const SizedBox(width: 12),
+
+    Expanded(
+      child: ElevatedButton.icon(
+        icon: const Icon(Icons.check_circle),
+        label: const Text("Konfirmasi"),
+        onPressed: () {
+          _showConfirmDialog(
+            title: "Konfirmasi Pesanan",
+            message:
+                "Konfirmasi pembayaran DP customer?",
+            nextStatus: "Diproses",
+          );
+        },
+      ),
+    ),
+  ],
+);
+
+case "Dalam Pengiriman":
+return SizedBox(
+  width: double.infinity,
+  child: ElevatedButton.icon(
+    icon: const Icon(Icons.inventory),
+    label: const Text(
+      "Barang Sudah Sampai",
+    ),
+    onPressed: () async {
+
+  final result = await Navigator.push(
+
+    context,
+
+    MaterialPageRoute(
+
+      builder: (_) => KonfirmasiBarangPage(
+        pesanan: widget.pesanan,
+      ),
+
+    ),
+
+  );
+
+  if (result == true) {
+    Navigator.pop(context, true);
+  }
+
+},
+  ),
+);
+
+case "Menunggu Pelunasan":
+return SizedBox(
+  width: double.infinity,
+  child: ElevatedButton.icon(
+    icon: const Icon(Icons.payments),
+    label: const Text(
+      "Konfirmasi Pelunasan",
+    ),
+    onPressed: () {
+      _showConfirmDialog(
+        title: "Pelunasan",
+        message:
+            "Customer sudah melakukan pelunasan?",
+        nextStatus:
+            "Dikirim ke Rumah Customer",
+      );
+    },
+  ),
+);
+
+case "Menunggu Verifikasi Pelunasan":
+  return SizedBox(
+    width: double.infinity,
+    child: ElevatedButton.icon(
+      icon: const Icon(Icons.verified),
+      label: const Text("Verifikasi Pelunasan"),
+      onPressed: () {
+        _showConfirmDialog(
+          title: "Verifikasi Pelunasan",
+          message:
+              "Apakah bukti pelunasan customer sudah valid?",
+          nextStatus: "Dikirim ke Rumah Customer",
+        );
+      },
+    ),
+  );
+
+case "Dikirim ke Rumah Customer":
+return SizedBox(
+  width: double.infinity,
+  child: ElevatedButton.icon(
+    icon: const Icon(Icons.check),
+    label: const Text(
+      "Selesaikan Pesanan",
+    ),
+    onPressed: () {
+      _showConfirmDialog(
+        title: "Selesaikan Pesanan",
+        message:
+            "Pesanan sudah diterima customer?",
+        nextStatus: "Selesai",
+      );
+    },
+  ),
+);
+
+default:
+  return const SizedBox.shrink();
+}
+}
 
   @override
   Widget build(BuildContext context){
@@ -222,7 +436,7 @@ class DetailPesananAdmin extends StatelessWidget {
 
                         child: Text(
 
-                          pesanan.namaBarang,
+                          widget.pesanan.namaBarang,
 
                           style:
                               const TextStyle(
@@ -256,7 +470,7 @@ class DetailPesananAdmin extends StatelessWidget {
 
                       color:
                           getStatusColor(
-                            pesanan.status,
+                           widget.pesanan.status,
                           ),
 
                       borderRadius:
@@ -267,7 +481,7 @@ class DetailPesananAdmin extends StatelessWidget {
 
                     child: Text(
 
-                      pesanan.status,
+                      widget.pesanan.status,
 
                       style:
                           const TextStyle(
@@ -336,13 +550,10 @@ class DetailPesananAdmin extends StatelessWidget {
                   const SizedBox(height:20),
 
                   infoTile(
-
-                    icon: Icons.category,
-
-                    title: "Kategori Barang",
-
-                    value: pesanan.namaBarang,
-                  ),
+  icon: Icons.category,
+  title: "Kategori Barang",
+  value: widget.pesanan.kategori,
+),
 
                   infoTile(
 
@@ -350,7 +561,7 @@ class DetailPesananAdmin extends StatelessWidget {
 
                     title: "Detail Barang",
 
-                    value: pesanan.notes,
+                    value: widget.pesanan.notes,
                   ),
 
                   infoTile(
@@ -359,7 +570,7 @@ class DetailPesananAdmin extends StatelessWidget {
 
                     title: "Customer",
 
-                    value: pesanan.customerNama,
+                    value: widget.pesanan.customerNama,
                   ),
 
                   infoTile(
@@ -368,11 +579,11 @@ class DetailPesananAdmin extends StatelessWidget {
 
                     title: "Traveler",
 
-                    value: pesanan.namaTraveler.isEmpty
+                    value: widget.pesanan.namaTraveler.isEmpty
 
                         ? "Belum dipilih"
 
-                        : pesanan.namaTraveler,
+                        : widget.pesanan.namaTraveler,
                   ),
 
                   infoTile(
@@ -381,7 +592,7 @@ class DetailPesananAdmin extends StatelessWidget {
 
                     title: "Estimasi Kepulangan",
 
-                    value: pesanan.tanggalKepulangan,
+                    value: widget.pesanan.tanggalKepulangan,
                   ),
 
                   infoTile(
@@ -390,7 +601,7 @@ class DetailPesananAdmin extends StatelessWidget {
 
                     title: "Alamat Pengiriman",
 
-                    value: pesanan.alamat,
+                    value: widget.pesanan.alamat,
                   ),
                 ],
               ),
@@ -448,115 +659,87 @@ class DetailPesananAdmin extends StatelessWidget {
 
                   const SizedBox(height:18),
 
-                  ClipRRect(
-
-                    borderRadius:
-                        BorderRadius.circular(16),
-
-                    child: Container(
-
-                      width: double.infinity,
-
-                      height:220,
-
-                      color:
-                          Colors.grey.shade200,
-
-                      child: const Column(
-
-                        mainAxisAlignment:
-                            MainAxisAlignment.center,
-
-                        children: [
-
-                          Icon(
-
-                            Icons.image,
-
-                            size:60,
-
-                            color: Colors.grey,
-                          ),
-
-                          SizedBox(height:12),
-
-                          Text(
-
-                            "Preview Bukti Transfer",
-
-                            style: TextStyle(
-
-                              color: Colors.grey,
-                            ),
-                          ),
+                  widget.pesanan.dpBukti.isNotEmpty
+                  
+    ? ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Image.network(
+          "${ApiService.baseUrl}/${widget.pesanan.dpBukti}",
+          width: double.infinity,
+          height: 220,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return Container(
+              height: 220,
+              alignment: Alignment.center,
+              child: const Text(
+                "Gagal memuat gambar",
+              ),
+            );
+          },
+        ),
+      )
+    : Container(
+        height: 220,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: Colors.grey.shade200,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: const Text(
+          "Belum ada bukti transfer",
+        ),
+      ),
                         ],
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ),
 
             const SizedBox(height:30),
+        
+        const SizedBox(height: 24),
 
-SizedBox(
-
-  width: double.infinity,
-
-  height: 54,
-
-  child: ElevatedButton.icon(
-
-    style: ElevatedButton.styleFrom(
-
-      backgroundColor:
-          const Color(0xffB71C1C),
-
-      foregroundColor:
-          Colors.white,
-
-      shape:
-          RoundedRectangleBorder(
-
-        borderRadius:
-            BorderRadius.circular(16),
-      ),
-    ),
-
-    onPressed: () {
-
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-
-        const SnackBar(
-
-          content: Text(
-
-            "Pesanan berhasil dikonfirmasi",
-          ),
-        ),
-      );
-    },
-
-    icon: const Icon(
-
-      Icons.verified,
-    ),
-
-    label: const Text(
-
-      "Konfirmasi Pesanan",
-
-      style: TextStyle(
-
-        fontSize:16,
-
-        fontWeight:
-            FontWeight.bold,
-      ),
-    ),
+const Text(
+  "Bukti Pelunasan",
+  style: TextStyle(
+    fontSize: 18,
+    fontWeight: FontWeight.bold,
   ),
 ),
+
+const SizedBox(height: 18),
+
+widget.pesanan.pelunasanBukti.isNotEmpty
+    ? ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Image.network(
+          "${ApiService.baseUrl}/${widget.pesanan.pelunasanBukti}",
+          width: double.infinity,
+          height: 220,
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) {
+            return Container(
+              height: 220,
+              alignment: Alignment.center,
+              child: const Text(
+                "Gagal memuat gambar",
+              ),
+            );
+          },
+        ),
+      )
+    : Container(
+        height: 220,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: Colors.grey.shade200,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: const Text(
+          "Belum ada bukti pelunasan",
+        ),
+      ),
+
+buildActionButton(),
             const SizedBox(height:20),
           ],
         ),

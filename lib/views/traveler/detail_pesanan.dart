@@ -1,39 +1,63 @@
 import 'package:flutter/material.dart';
 
+import 'package:provider/provider.dart';
+import '../../viewmodels/pesanan_viewmodel.dart';
+
 import '../../models/pesanan_model.dart';
-import '../customer/tracking_page.dart';
 
-class DetailPesananPage extends StatelessWidget {
-
+class DetailPesananPage extends StatefulWidget {
   final Pesanan pesanan;
 
   const DetailPesananPage({
-
     super.key,
-
     required this.pesanan,
   });
 
-  Color getStatusColor(String status){
+  @override
+  State<DetailPesananPage> createState() =>
+      _DetailPesananPageState();
+}
 
-    switch(status){
+class _DetailPesananPageState
+    extends State<DetailPesananPage> {
 
-      case "Pending":
-        return Colors.orange;
+  Color getStatusColor(String status) {
+  switch (status) {
 
-      case "Diproses":
-        return Colors.blue;
+    case "Diproses":
+      return Colors.blue;
 
-      case "Dikirim":
-        return Colors.purple;
+    case "On Hold":
+      return Colors.deepOrange;
 
-      case "Selesai":
-        return Colors.green;
+    case "Tidak Ditemukan":
+      return Colors.red;
 
-      default:
-        return Colors.grey;
-    }
+    case "Dalam Pengiriman":
+      return Colors.purple;
+
+    default:
+      return Colors.grey;
   }
+}
+
+late String selectedStatus;
+
+final List<String> statusList = [
+  "Diproses",
+  "On Hold",
+  "Tidak Ditemukan",
+  "Dalam Pengiriman",
+];
+
+@override
+void initState() {
+  super.initState();
+
+  selectedStatus = statusList.contains(widget.pesanan.status)
+    ? widget.pesanan.status
+    : statusList.first;
+}
 
   @override
   Widget build(BuildContext context){
@@ -55,7 +79,7 @@ class DetailPesananPage extends StatelessWidget {
 
         title: const Text(
 
-          "Detail Pesanan",
+          "Update Pesanan",
 
           style: TextStyle(
 
@@ -132,7 +156,7 @@ class DetailPesananPage extends StatelessWidget {
 
                   Text(
 
-                    pesanan.namaBarang,
+                    widget.pesanan.namaBarang,
 
                     style: const TextStyle(
 
@@ -148,7 +172,7 @@ class DetailPesananPage extends StatelessWidget {
 
                   Text(
 
-                    pesanan.kategori,
+                    widget.pesanan.kategori,
 
                     style: const TextStyle(
 
@@ -246,7 +270,7 @@ class DetailPesananPage extends StatelessWidget {
 
                     color:
                         getStatusColor(
-                          pesanan.status,
+                          widget.pesanan.status,
                         ),
 
                     borderRadius:
@@ -257,7 +281,7 @@ class DetailPesananPage extends StatelessWidget {
 
                   child: Text(
 
-                    pesanan.status,
+                    widget.pesanan.status,
 
                     style:
                         const TextStyle(
@@ -280,7 +304,7 @@ class DetailPesananPage extends StatelessWidget {
 
               "Customer",
 
-              pesanan.customerNama,
+              widget.pesanan.customerNama,
             ),
 
             _infoTile(
@@ -289,17 +313,8 @@ class DetailPesananPage extends StatelessWidget {
 
               "Kategori",
 
-              pesanan.kategori,
+              widget.pesanan.kategori,
             ),
-
-                  _infoTile(
-
-                    Icons.category,
-
-                    "Kategori",
-
-                    pesanan.kategori,
-                  ),
 
                   _infoTile(
 
@@ -307,7 +322,7 @@ class DetailPesananPage extends StatelessWidget {
 
   "Traveler",
 
-  pesanan.namaTraveler,
+  widget.pesanan.namaTraveler,
 ),
 
 _infoTile(
@@ -316,7 +331,7 @@ _infoTile(
 
   "Tanggal Kepulangan",
 
-  pesanan.tanggalKepulangan,
+  widget.pesanan.tanggalKepulangan,
 ),
           ],
         ),
@@ -380,7 +395,7 @@ _infoTile(
 
               "Alamat",
 
-              pesanan.alamat,
+              widget.pesanan.alamat,
             ),
 
             _infoTile(
@@ -389,80 +404,84 @@ _infoTile(
 
               "Catatan",
 
-              pesanan.notes,
+              widget.pesanan.notes,
             ),
+
+          const SizedBox(height: 20),
+
+const Text(
+  "Update Status",
+  style: TextStyle(
+    fontSize: 16,
+    fontWeight: FontWeight.bold,
+  ),
+),
+
+const SizedBox(height: 10),
+
+DropdownButtonFormField<String>(
+  value: selectedStatus,
+  decoration: InputDecoration(
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+    ),
+  ),
+  items: statusList.map((status) {
+    return DropdownMenuItem(
+      value: status,
+      child: Text(status),
+    );
+  }).toList(),
+  onChanged: (value) {
+    setState(() {
+      selectedStatus = value!;
+    });
+  },
+),
           ],
         ),
       ),
 
-      const SizedBox(height:30),
-
       SizedBox(
-
-        width: double.infinity,
-
-        height: 54,
-
-        child: ElevatedButton.icon(
-
-          style:
-              ElevatedButton.styleFrom(
-
-            backgroundColor:
-                const Color(
-                    0xffB71C1C),
-
-            foregroundColor:
-                Colors.white,
-
-            elevation: 0,
-
-            shape:
-                RoundedRectangleBorder(
-
-              borderRadius:
-                  BorderRadius.circular(
-                16,
-              ),
-            ),
-          ),
-
-          icon: const Icon(
-            Icons.local_shipping,
-          ),
-
-          label: const Text(
-
-            "Lacak Pesanan",
-
-            style: TextStyle(
-
-              fontSize:16,
-
-              fontWeight:
-                  FontWeight.bold,
-            ),
-          ),
-
-          onPressed: () {
-
-            Navigator.push(
-
-              context,
-
-              MaterialPageRoute(
-
-                builder: (_) =>
-
-                    TrackingPage(
-
-                  pesanan: pesanan,
-                ),
-              ),
-            );
-          },
-        ),
+  width: double.infinity,
+  height: 54,
+  child: ElevatedButton.icon(
+    style: ElevatedButton.styleFrom(
+      backgroundColor: const Color(0xffB71C1C),
+      foregroundColor: Colors.white,
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
       ),
+    ),
+    icon: const Icon(Icons.save),
+    label: const Text(
+      "Simpan Perubahan",
+      style: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+    onPressed: () async {
+      await context.read<PesananViewModel>().updateStatus(
+            widget.pesanan.id,
+            selectedStatus,
+          );
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            "Status berhasil diperbarui",
+          ),
+        ),
+      );
+
+      Navigator.pop(context);
+    },
+  ),
+),
 
       const SizedBox(height:20),
 

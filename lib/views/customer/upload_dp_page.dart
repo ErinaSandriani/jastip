@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../viewmodels/pesanan_viewmodel.dart';
+import '../../viewmodels/auth_viewmodel.dart';
 
 class UploadDpPage extends StatefulWidget {
 
@@ -444,6 +445,10 @@ class _UploadDpPageState
 
               return;
             }
+
+            final authVM = context.read<AuthViewModel>();
+
+            pesananVM.currentUserId = authVM.userId;
 
             final orderId =
                 await pesananVM.createOrderGetId(

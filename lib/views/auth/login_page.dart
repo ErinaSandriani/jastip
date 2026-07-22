@@ -253,51 +253,39 @@ const SizedBox(height: 24),
                           if (role ==
                               "customer") {
 
-                            Navigator.pushReplacement(
-
-                              context,
-
-                              MaterialPageRoute(
-
-                                builder:
-                                    (_) =>
-                                        const CustomerMainPage(),
-                              ),
-                            );
+                            Navigator.pushAndRemoveUntil(
+                             context,
+                             MaterialPageRoute(
+                                  builder: (_) => const CustomerMainPage(),
+                                   ),
+                                  (route) => false,
+                                    );
 
                           // TRAVELER
                           } else if (
                               role ==
                               "traveler") {
 
-                            Navigator.pushReplacement(
-
-                              context,
-
-                              MaterialPageRoute(
-
-                                builder:
-                                    (_) =>
-                                        const TravelerHomePage(),
-                              ),
-                            );
+                            Navigator.pushAndRemoveUntil(
+  context,
+  MaterialPageRoute(
+    builder: (_) => const TravelerHomePage(),
+  ),
+  (route) => false,
+);
 
                           // ADMIN
                           } else if (
                               role ==
                               "admin") {
 
-                            Navigator.pushReplacement(
-
-                              context,
-
-                              MaterialPageRoute(
-
-                                builder:
-                                    (_) =>
-                                        const AdminPage(),
-                              ),
-                            );
+                            Navigator.pushAndRemoveUntil(
+  context,
+  MaterialPageRoute(
+    builder: (_) => const AdminPage(),
+  ),
+  (route) => false,
+);
 
                           } else {
 

@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 
 import '../../viewmodels/pesanan_viewmodel.dart';
 
+import '../../viewmodels/auth_viewmodel.dart';
+
 import 'detail_pesanan.dart';
 
 class TravelerOrdersPage
@@ -21,30 +23,21 @@ class TravelerOrdersPage
 
 class _TravelerOrdersPageState
     extends State<TravelerOrdersPage> {
-
-  final List<String> statusList = [
-
-    "Pending",
-
-    "Diproses",
-
-    "Dalam Pengiriman",
-
-    "Selesai",
-  ];
-
   @override
-  void initState() {
+void initState() {
+  super.initState();
 
-    super.initState();
+  Future.microtask(() {
+    final auth =
+        context.read<AuthViewModel>();
 
-    Future.microtask(() {
-
-      context
-          .read<PesananViewModel>()
-          .getPesanan();
-    });
-  }
+    context
+        .read<PesananViewModel>()
+        .getPesananTraveler(
+          auth.userId!,
+        );
+  });
+}
 
   Color getStatusColor(
     String status,
@@ -63,6 +56,15 @@ class _TravelerOrdersPageState
 
       case "Selesai":
         return Colors.green;
+      
+      case "On Hold":
+        return Colors.deepOrange;
+
+      case "Tidak Ditemukan":
+        return Colors.red;
+
+      case "Dibatalkan":
+          return Colors.grey;
 
       default:
         return Colors.grey;
@@ -143,14 +145,6 @@ class _TravelerOrdersPageState
                         pesananVM
                                 .pesananList[
                             index];
-
-                    String selectedStatus =
-                        statusList.contains(
-                                pesanan.status)
-
-                            ? pesanan.status
-
-                            : statusList.first;
 
                     return Container(
 
@@ -398,195 +392,39 @@ class _TravelerOrdersPageState
                               ],
                             ),
 
-                            const SizedBox(
-                              height: 22,
-                            ),
-
-                                DropdownButtonFormField<String>(
-
-  value: selectedStatus,
-
-  decoration: InputDecoration(
-
-    labelText: "Update Status",
-
-    filled: true,
-
-    fillColor:
-        const Color(0xffF8F8F8),
-
-    border:
-        OutlineInputBorder(
-
-      borderRadius:
-          BorderRadius.circular(
-        14,
-      ),
-
-      borderSide:
-          BorderSide.none,
-    ),
-  ),
-
-  items:
-      statusList.map(
-
-    (status) {
-
-      return DropdownMenuItem(
-
-        value: status,
-
-        child: Text(
-          status,
-        ),
-      );
-    },
-  ).toList(),
-
-  onChanged: (value) {
-
-    setState(() {
-
-      selectedStatus =
-          value!;
-    });
-  },
-),
-
 const SizedBox(
   height: 22,
 ),
 
-Row(
-
-  children: [
-
-    Expanded(
-
-      child: OutlinedButton.icon(
-
-        style:
-            OutlinedButton.styleFrom(
-
-          foregroundColor:
-              const Color(
-                  0xffB71C1C),
-
-          side:
-              const BorderSide(
-
-            color:
-                Color(
-                    0xffB71C1C),
-          ),
-
-          shape:
-              RoundedRectangleBorder(
-
-            borderRadius:
-                BorderRadius.circular(
-              14,
-            ),
-          ),
-        ),
-
-        icon: const Icon(
-
-          Icons.visibility,
-        ),
-
-        label: const Text(
-          "Detail",
-        ),
-
-        onPressed: () {
-
-          Navigator.push(
-
-            context,
-
-            MaterialPageRoute(
-
-              builder: (_) =>
-                  DetailPesananPage(
-
-                pesanan: pesanan,
-              ),
-            ),
-          );
-        },
+SizedBox(
+  width: double.infinity,
+  child: OutlinedButton.icon(
+    style: OutlinedButton.styleFrom(
+      foregroundColor: const Color(0xffB71C1C),
+      side: const BorderSide(
+        color: Color(0xffB71C1C),
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
       ),
     ),
-
-    const SizedBox(
-      width: 12,
-    ),
-
-    Expanded(
-
-      child: ElevatedButton.icon(
-
-        style:
-            ElevatedButton.styleFrom(
-
-          backgroundColor:
-              const Color(
-                  0xffB71C1C),
-
-          foregroundColor:
-              Colors.white,
-
-          elevation: 0,
-
-          shape:
-              RoundedRectangleBorder(
-
-            borderRadius:
-                BorderRadius.circular(
-              14,
-            ),
+    icon: const Icon(Icons.edit_note),
+    label: const Text("Update"),
+    onPressed: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => DetailPesananPage(
+            pesanan: pesanan,
           ),
         ),
+      );
+    },
+  ),
+),
 
-        icon: const Icon(
-          Icons.save,
-        ),
-
-        label: const Text(
-          "Simpan",
-        ),
-
-        onPressed: () async {
-
-          await pesananVM
-              .updateStatus(
-
-            pesanan.id,
-
-            selectedStatus,
-          );
-
-          if (!context.mounted) {
-            return;
-          }
-
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(
-
-            const SnackBar(
-
-              content: Text(
-
-                "Status berhasil diperbarui",
-              ),
-            ),
-          );
-        },
-      ),
-    ),
-  ],
+const SizedBox(
+  height: 6,
 ),
 
 const SizedBox(

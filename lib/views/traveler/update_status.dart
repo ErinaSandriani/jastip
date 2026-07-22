@@ -38,8 +38,6 @@ class _UpdateStatusPageState
     "Diproses",
 
     "Dalam Pengiriman",
-
-    "Selesai",
   ];
 
   @override

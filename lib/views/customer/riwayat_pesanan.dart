@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../viewmodels/pesanan_viewmodel.dart';
-import '../traveler/detail_pesanan.dart';
+import 'tracking_page.dart';
+import '../../viewmodels/auth_viewmodel.dart';
 
 class RiwayatPesananPage extends StatefulWidget {
   const RiwayatPesananPage({
@@ -22,10 +23,15 @@ class _RiwayatPesananPageState
     super.initState();
 
     Future.microtask(() {
-      context
-          .read<PesananViewModel>()
-          .getPesanan();
-    });
+
+  final authVM = context.read<AuthViewModel>();
+  final pesananVM = context.read<PesananViewModel>();
+
+  pesananVM.currentUserId = authVM.userId;
+
+  pesananVM.getPesanan();
+
+});
   }
 
   Color getStatusColor(String status) {
@@ -428,13 +434,9 @@ class _RiwayatPesananPageState
 
                 MaterialPageRoute(
 
-                  builder: (_) =>
-
-                      DetailPesananPage(
-
-                    pesanan:
-                        pesanan,
-                  ),
+                  builder: (_) => TrackingPage(
+  pesanan: pesanan,
+),
                 ),
               );
             },

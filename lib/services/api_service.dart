@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class ApiService {
 
@@ -19,4 +21,32 @@ class ApiService {
 
     return "http://localhost:8000";
   }
+
+  static Future<Map<String, dynamic>> updatePelunasan({
+  required int orderId,
+  required int hargaBarang,
+  required int feeJastip,
+  required int ongkirIndonesia,
+  required int totalBayar,
+  required String deadlinePelunasan,
+}) async {
+
+  final response = await http.post(
+
+    Uri.parse("$baseUrl/update_pelunasan.php"),
+
+    body: {
+      "order_id": orderId.toString(),
+      "harga_barang": hargaBarang.toString(),
+      "fee_jastip": feeJastip.toString(),
+      "ongkir_indonesia": ongkirIndonesia.toString(),
+      "total_bayar": totalBayar.toString(),
+      "deadline_pelunasan": deadlinePelunasan,
+    },
+
+  );
+
+  return jsonDecode(response.body);
+}
+
 }

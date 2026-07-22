@@ -14,6 +14,9 @@ class PesananViewModel extends ChangeNotifier {
 
   List<Pesanan> pesananList = [];
 
+  // USER LOGIN SAAT INI
+int? currentUserId;
+
   // ======================
   // GET PESANAN
   // ======================
@@ -23,8 +26,10 @@ class PesananViewModel extends ChangeNotifier {
 
     try {
       final response = await http.get(
-        Uri.parse("${ApiService.baseUrl}/get_orders.php"),
-      );
+  Uri.parse(
+    "${ApiService.baseUrl}/get_orders.php?user_id=$currentUserId",
+  ),
+);
 
       final data = jsonDecode(response.body);
 
@@ -40,6 +45,32 @@ class PesananViewModel extends ChangeNotifier {
     isLoading = false;
     notifyListeners();
   }
+
+  Future<void> getPesananTraveler(int travelerId) async {
+  isLoading = true;
+  notifyListeners();
+
+  try {
+    final response = await http.get(
+      Uri.parse(
+        "${ApiService.baseUrl}/get_orders.php?traveler_id=$travelerId",
+      ),
+    );
+
+    final data = jsonDecode(response.body);
+
+    if (data["status"] == "success") {
+      pesananList = (data["data"] as List)
+          .map((item) => Pesanan.fromJson(item))
+          .toList();
+    }
+  } catch (e) {
+    debugPrint(e.toString());
+  }
+
+  isLoading = false;
+  notifyListeners();
+}
 
   // ======================
   // CREATE ORDER (return bool)
@@ -62,13 +93,13 @@ class PesananViewModel extends ChangeNotifier {
       final response = await http.post(
         Uri.parse("${ApiService.baseUrl}/create_order.php"),
         body: {
-          "user_id": "5",
-          "traveler_id": travelerId.toString(),
-          "kategori": kategori,
-          "nama_penerima": namaLengkap,
-          "nomor_hp": nomorTelepon,
-          "alamat": "$alamat, $kota, $provinsi, $kodePos",
-          "notes": notes,
+         "user_id": currentUserId.toString(),
+         "traveler_id": travelerId.toString(),
+        "kategori": kategori,
+         "nama_penerima": namaLengkap,
+         "nomor_hp": nomorTelepon,
+         "alamat": "$alamat, $kota, $provinsi, $kodePos",
+         "notes": notes,
         },
       );
 
@@ -107,10 +138,19 @@ class PesananViewModel extends ChangeNotifier {
     required int travelerId,
   }) async {
     try {
+      debugPrint("===== CREATE ORDER =====");
+  debugPrint("currentUserId = $currentUserId");
+  debugPrint("travelerId = $travelerId");
+  debugPrint("kategori = $kategori");
+  debugPrint("namaLengkap = $namaLengkap");
+  debugPrint("nomorTelepon = $nomorTelepon");
+  debugPrint("alamat = $alamat, $kota, $provinsi, $kodePos");
+  debugPrint("notes = $notes"); 
+  
       final response = await http.post(
         Uri.parse("${ApiService.baseUrl}/create_order.php"),
         body: {
-          "user_id": "5",
+          "user_id": currentUserId.toString(),
           "traveler_id": travelerId.toString(),
           "kategori": kategori,
           "nama_penerima": namaLengkap,
@@ -133,7 +173,7 @@ class PesananViewModel extends ChangeNotifier {
   }
 
   // ======================
-  // UPLOAD DP (FIXED - INI KUNCI MASALAHMU)
+  // UPLOAD DP 
   // ======================
   Future<bool> uploadDp({
     required int orderId,
@@ -173,6 +213,60 @@ class PesananViewModel extends ChangeNotifier {
       return false;
     }
   }
+
+  // ======================
+// UPLOAD PELUNASAN
+// ======================
+Future<bool> uploadPelunasan({
+  required int orderId,
+  required File image,
+}) async {
+  try {
+    var request = http.MultipartRequest(
+      "POST",
+      Uri.parse(
+        "${ApiService.baseUrl}/upload_pelunasan.php",
+      ),
+    );
+
+    request.fields["order_id"] =
+        orderId.toString();
+
+    request.files.add(
+      await http.MultipartFile.fromPath(
+        "image",
+        image.path,
+      ),
+    );
+
+    final streamedResponse =
+        await request.send();
+
+    final responseBody =
+        await streamedResponse.stream.bytesToString();
+
+    debugPrint(
+      "UPLOAD PELUNASAN RESPONSE: $responseBody",
+    );
+
+    final data = jsonDecode(responseBody);
+
+    if (data["status"] == "success") {
+      await getPesanan(); // refresh list
+      return true;
+    } else {
+      debugPrint(
+        "UPLOAD PELUNASAN FAILED: ${data["message"]}",
+      );
+      return false;
+    }
+  } catch (e) {
+    debugPrint(
+      "UPLOAD PELUNASAN ERROR: $e",
+    );
+    return false;
+  }
+}
 
   // ======================
 // UPDATE STATUS

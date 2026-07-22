@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../viewmodels/auth_viewmodel.dart';
 import '../../viewmodels/traveler_viewmodel.dart';
+import '../../models/traveler_model.dart';
 
 class ReturnDatePage extends StatefulWidget {
   const ReturnDatePage({
@@ -20,8 +21,37 @@ class _ReturnDatePageState
   DateTime? selectedDate;
 
   @override
-  void initState() {
-    super.initState();
+void initState() {
+  super.initState();
+
+  WidgetsBinding.instance.addPostFrameCallback((_) async {
+    final auth = context.read<AuthViewModel>();
+    final travelerVM = context.read<TravelerViewModel>();
+
+    await travelerVM.getAllTravelers();
+
+    final traveler = travelerVM.travelerList.firstWhere(
+      (e) => e.id == auth.userId,
+      orElse: () => TravelerModel(
+        id: 0,
+        nama: "",
+        email: "",
+        noHp: "",
+        alamat: "",
+        tanggalPulang: "",
+        statusVerifikasi: "",
+      ),
+    );
+
+    if (traveler.id != 0 &&
+        traveler.tanggalPulang.isNotEmpty) {
+      setState(() {
+        selectedDate = DateTime.parse(
+          traveler.tanggalPulang,
+        );
+      });
+    }
+  });
   }
 
   Future<void> pickDate() async {

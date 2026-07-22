@@ -9,843 +9,309 @@ import 'return_date_page.dart';
 import 'traveler_orders_page.dart';
 
 class TravelerHomePage extends StatefulWidget {
-
-  const TravelerHomePage({
-    super.key,
-  });
+  const TravelerHomePage({super.key});
 
   @override
-  State<TravelerHomePage> createState() =>
-      _TravelerHomePageState();
+  State<TravelerHomePage> createState() => _TravelerHomePageState();
 }
 
-class _TravelerHomePageState
-    extends State<TravelerHomePage> {
+class _TravelerHomePageState extends State<TravelerHomePage> {
+  int currentIndex = 0;
 
   @override
   void initState() {
-
     super.initState();
 
     Future.microtask(() {
-
-      context
-          .read<PesananViewModel>()
-          .getPesanan();
-
+      context.read<PesananViewModel>().getPesanan();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-
-    final auth =
-        context.watch<AuthViewModel>();
-
-    final pesananVM =
-        context.watch<PesananViewModel>();
-
-    final pesananList =
-        pesananVM.pesananList;
-
-    final pending =
-        pesananList
-            .where(
-              (e) =>
-                  e.status ==
-                  "Pending",
-            )
-            .length;
-
-    final diproses =
-        pesananList
-            .where(
-              (e) =>
-                  e.status ==
-                  "Diproses",
-            )
-            .length;
-
-    final dikirim =
-        pesananList
-            .where(
-              (e) =>
-                  e.status ==
-                  "Dalam Pengiriman",
-            )
-            .length;
-
-    final selesai =
-        pesananList
-            .where(
-              (e) =>
-                  e.status ==
-                  "Selesai",
-            )
-            .length;
+    final pages = [
+      _buildDashboard(),
+      const TravelerOrdersPage(),
+      const ReturnDatePage(),
+      const ProfileTravelerPage(),
+    ];
 
     return Scaffold(
+      backgroundColor: const Color(0xffF5F5F5),
 
-      backgroundColor:
-          const Color(0xffF5F5F5),
+      body: pages[currentIndex],
 
-      appBar: AppBar(
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: currentIndex,
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: const Color(0xffB71C1C),
+        unselectedItemColor: Colors.grey,
 
-        elevation: 0,
+        onTap: (index) {
+          setState(() {
+            currentIndex = index;
+          });
+        },
 
-        backgroundColor:
-            Colors.white,
-
-        foregroundColor:
-            Colors.black,
-
-        centerTitle: true,
-
-        title: const Text(
-
-          "Traveler Dashboard",
-
-          style: TextStyle(
-
-            fontWeight:
-                FontWeight.bold,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: "Dashboard",
           ),
-        ),
-      ),
-
-      body: pesananVM.isLoading
-
-          ? const Center(
-
-              child:
-                  CircularProgressIndicator(),
-            )
-
-          : SingleChildScrollView(
-
-              padding:
-                  const EdgeInsets.all(
-                20,
-              ),
-
-              child: Column(
-
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
-
-                children: [
-
-                  Container(
-
-                    width:
-                        double.infinity,
-
-                    padding:
-                        const EdgeInsets.all(
-                      22,
-                    ),
-
-                    decoration:
-                        BoxDecoration(
-
-                      borderRadius:
-                          BorderRadius.circular(
-                        22,
-                      ),
-
-                      gradient:
-                          const LinearGradient(
-
-                        begin:
-                            Alignment.topLeft,
-
-                        end:
-                            Alignment.bottomRight,
-
-                        colors: [
-
-                          Color(0xffE53935),
-
-                          Color(0xffB71C1C),
-
-                        ],
-                      ),
-                    ),
-
-                    child: Column(
-
-                      crossAxisAlignment:
-                          CrossAxisAlignment.start,
-
-                      children: [
-
-                        const Text(
-
-                          "Selamat Datang 👋",
-
-                          style: TextStyle(
-
-                            color:
-                                Colors.white70,
-
-                            fontSize: 16,
-                          ),
-                        ),
-
-                        const SizedBox(
-                          height: 8,
-                        ),
-
-                        Text(
-
-                          auth.namaUser,
-
-                          style:
-                              const TextStyle(
-
-                            color:
-                                Colors.white,
-
-                            fontSize: 26,
-
-                            fontWeight:
-                                FontWeight.bold,
-                          ),
-                        ),
-
-                        const SizedBox(
-                          height: 10,
-                        ),
-
-                        const Text(
-
-                          "Kelola seluruh titipan customer dengan mudah.",
-
-                          style: TextStyle(
-
-                            color:
-                                Colors.white,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(
-                    height: 28,
-                  ),
-                  // 🔥 STATISTIK
-const Text(
-
-  "Statistik",
-
-  style: TextStyle(
-
-    fontSize: 20,
-
-    fontWeight: FontWeight.bold,
-  ),
-),
-
-const SizedBox(height: 16),
-
-Row(
-
-  children: [
-
-    Expanded(
-
-      child: _buildStatCard(
-
-        icon: Icons.pending_actions,
-
-        title: "Pending",
-
-        value: pending.toString(),
-
-        color: Colors.orange,
-      ),
-    ),
-
-    const SizedBox(width: 12),
-
-    Expanded(
-
-      child: _buildStatCard(
-
-        icon: Icons.sync,
-
-        title: "Diproses",
-
-        value: diproses.toString(),
-
-        color: Colors.blue,
-      ),
-    ),
-  ],
-),
-
-const SizedBox(height: 12),
-
-Row(
-
-  children: [
-
-    Expanded(
-
-      child: _buildStatCard(
-
-        icon: Icons.local_shipping,
-
-        title: "Dikirim",
-
-        value: dikirim.toString(),
-
-        color: Colors.purple,
-      ),
-    ),
-
-    const SizedBox(width: 12),
-
-    Expanded(
-
-      child: _buildStatCard(
-
-        icon: Icons.check_circle,
-
-        title: "Selesai",
-
-        value: selesai.toString(),
-
-        color: Colors.green,
-      ),
-    ),
-  ],
-),
-
-const SizedBox(height: 28),
-
-const Text(
-
-  "Quick Menu",
-
-  style: TextStyle(
-
-    fontSize: 20,
-
-    fontWeight: FontWeight.bold,
-  ),
-),
-
-const SizedBox(height: 16),
-
-Row(
-
-  children: [
-
-    Expanded(
-
-      child: _buildMenuCard(
-
-        context: context,
-
-        icon: Icons.inventory_2_outlined,
-
-        title: "Pesanan",
-
-        page: const TravelerOrdersPage(),
-      ),
-    ),
-
-    const SizedBox(width: 10),
-
-    Expanded(
-
-      child: _buildMenuCard(
-
-        context: context,
-
-        icon: Icons.calendar_month,
-
-        title: "Jadwal",
-
-        page: const ReturnDatePage(),
-      ),
-    ),
-
-    const SizedBox(width: 10),
-
-    Expanded(
-
-      child: _buildMenuCard(
-
-        context: context,
-
-        icon: Icons.person_outline,
-
-        title: "Profile",
-
-        page: const ProfileTravelerPage(),
-      ),
-    ),
-  ],
-),
-
-const SizedBox(height: 28),
-
-const Text(
-
-  "Aktivitas Terbaru",
-
-  style: TextStyle(
-
-    fontSize: 20,
-
-    fontWeight: FontWeight.bold,
-  ),
-),
-
-const SizedBox(height: 16),
-
-if (pesananList.isEmpty)
-
-Container(
-
-  width: double.infinity,
-
-  padding: const EdgeInsets.all(22),
-
-  decoration: BoxDecoration(
-
-    color: Colors.white,
-
-    borderRadius:
-        BorderRadius.circular(18),
-
-    boxShadow: [
-
-      BoxShadow(
-
-        color: Colors.black.withOpacity(.05),
-
-        blurRadius: 8,
-
-        offset: const Offset(0,3),
-      ),
-    ],
-  ),
-
-  child: const Column(
-
-    children: [
-
-      Icon(
-
-        Icons.inventory_2_outlined,
-
-        size: 60,
-
-        color: Colors.grey,
-      ),
-
-      SizedBox(height: 12),
-
-      Text(
-
-        "Belum ada aktivitas",
-
-        style: TextStyle(
-
-          fontWeight: FontWeight.bold,
-
-          fontSize: 16,
-        ),
-      ),
-
-      SizedBox(height: 6),
-
-      Text(
-
-        "Pesanan customer akan muncul di sini.",
-
-        textAlign: TextAlign.center,
-
-        style: TextStyle(
-
-          color: Colors.black54,
-        ),
-      ),
-    ],
-  ),
-)
-
-else
-
-...pesananList.take(3).map(
-
-  (pesanan) {
-
-    return Container(
-
-      margin:
-          const EdgeInsets.only(
-        bottom: 12,
-      ),
-
-      decoration: BoxDecoration(
-
-        color: Colors.white,
-
-        borderRadius:
-            BorderRadius.circular(18),
-
-        boxShadow: [
-
-          BoxShadow(
-
-            color: Colors.black.withOpacity(.05),
-
-            blurRadius: 8,
-
-            offset: const Offset(0,3),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.inventory_2),
+            label: "Pesanan",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calendar_month),
+            label: "Jadwal",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: "Profile",
           ),
         ],
       ),
+    );
+  }
 
-      child: ListTile(
+  Widget _buildDashboard() {
+    final auth = context.watch<AuthViewModel>();
+    final pesananVM = context.watch<PesananViewModel>();
 
-        contentPadding:
-            const EdgeInsets.symmetric(
+    final pesananList = pesananVM.pesananList;
 
-          horizontal: 16,
+    final pending = pesananList
+        .where((e) => e.status == "Pending")
+        .length;
 
-          vertical: 8,
-        ),
+    final diproses = pesananList
+        .where((e) => e.status == "Diproses")
+        .length;
 
-        leading: CircleAvatar(
+    final dikirim = pesananList
+        .where((e) => e.status == "Dalam Pengiriman")
+        .length;
 
-          backgroundColor:
-              _getStatusColor(
-            pesanan.status,
-          ),
+    final selesai = pesananList
+        .where((e) => e.status == "Selesai")
+        .length;
 
-          child: const Icon(
+    if (pesananVM.isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
 
-            Icons.shopping_bag,
+    return Scaffold(
+      backgroundColor: const Color(0xffF5F5F5),
 
-            color: Colors.white,
-          ),
-        ),
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        centerTitle: true,
 
-        title: Text(
-
-          pesanan.namaBarang,
-
-          style: const TextStyle(
-
-            fontWeight:
-                FontWeight.bold,
-          ),
-        ),
-
-        subtitle: Column(
-
-          crossAxisAlignment:
-              CrossAxisAlignment.start,
-
-          children: [
-
-            const SizedBox(height: 4),
-
-            Text(
-              pesanan.namaTraveler,
-            ),
-
-            Text(
-
-              pesanan.tanggalKepulangan,
-
-              style: const TextStyle(
-
-                color: Colors.black54,
-
-                fontSize: 12,
-              ),
-            ),
-          ],
-        ),
-
-        trailing: Container(
-
-          padding:
-              const EdgeInsets.symmetric(
-
-            horizontal: 10,
-
-            vertical: 5,
-          ),
-
-          decoration: BoxDecoration(
-
-            color:
-                _getStatusColor(
-                  pesanan.status,
-                ).withOpacity(.15),
-
-            borderRadius:
-                BorderRadius.circular(20),
-          ),
-
-          child: Text(
-
-            pesanan.status,
-
-            style: TextStyle(
-
-              color:
-                  _getStatusColor(
-                    pesanan.status,
-                  ),
-
-              fontWeight:
-                  FontWeight.bold,
-
-              fontSize: 12,
-            ),
+        title: const Text(
+          "Traveler Dashboard",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
           ),
         ),
       ),
-    );
 
-  },
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
 
-).toList(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
 
+          children: [
+
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(22),
+
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(22),
+
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+
+                  colors: [
+                    Color(0xffE53935),
+                    Color(0xffB71C1C),
+                  ],
+                ),
+              ),
+
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+
+                children: [
+
+                  const Text(
+                    "Selamat Datang 👋",
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 16,
+                    ),
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  Text(
+                    auth.namaUser,
+
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 26,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  const Text(
+                    "Kelola seluruh titipan customer dengan mudah.",
+
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
                 ],
               ),
             ),
+
+            const SizedBox(height: 28),
+
+            const Text(
+              "Statistik",
+
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+                        Row(
+              children: [
+                Expanded(
+                  child: _buildStatCard(
+                    icon: Icons.pending_actions,
+                    title: "Pending",
+                    value: pending.toString(),
+                    color: Colors.orange,
+                  ),
+                ),
+
+                const SizedBox(width: 12),
+
+                Expanded(
+                  child: _buildStatCard(
+                    icon: Icons.sync,
+                    title: "Diproses",
+                    value: diproses.toString(),
+                    color: Colors.blue,
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 12),
+
+            Row(
+              children: [
+                Expanded(
+                  child: _buildStatCard(
+                    icon: Icons.local_shipping,
+                    title: "Dikirim",
+                    value: dikirim.toString(),
+                    color: Colors.purple,
+                  ),
+                ),
+
+                const SizedBox(width: 12),
+
+                Expanded(
+                  child: _buildStatCard(
+                    icon: Icons.check_circle,
+                    title: "Selesai",
+                    value: selesai.toString(),
+                    color: Colors.green,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
+
   Widget _buildStatCard({
-
-  required IconData icon,
-
-  required String title,
-
-  required String value,
-
-  required Color color,
-
-}) {
-
-  return Container(
-
-    padding: const EdgeInsets.symmetric(
-
-      vertical: 18,
-
-      horizontal: 12,
-    ),
-
-    decoration: BoxDecoration(
-
-      color: Colors.white,
-
-      borderRadius:
-          BorderRadius.circular(18),
-
-      boxShadow: [
-
-        BoxShadow(
-
-          color:
-              Colors.black.withOpacity(.05),
-
-          blurRadius: 8,
-
-          offset:
-              const Offset(0,3),
-        ),
-      ],
-    ),
-
-    child: Column(
-
-      mainAxisAlignment:
-          MainAxisAlignment.center,
-
-      children: [
-
-        CircleAvatar(
-
-          radius: 22,
-
-          backgroundColor:
-              color.withOpacity(.15),
-
-          child: Icon(
-
-            icon,
-
-            color: color,
-
-            size: 24,
-          ),
-        ),
-
-        const SizedBox(height: 12),
-
-        Text(
-
-          value,
-
-          style: const TextStyle(
-
-            fontSize: 22,
-
-            fontWeight:
-                FontWeight.bold,
-          ),
-        ),
-
-        const SizedBox(height: 4),
-
-        Text(
-
-          title,
-
-          style: const TextStyle(
-
-            color: Colors.black54,
-          ),
-        ),
-      ],
-    ),
-  );
-}
-
-Widget _buildMenuCard({
-
-  required BuildContext context,
-
-  required IconData icon,
-
-  required String title,
-
-  required Widget page,
-
-}) {
-
-  return InkWell(
-
-    borderRadius:
-        BorderRadius.circular(18),
-
-    onTap: () {
-
-      Navigator.push(
-
-        context,
-
-        MaterialPageRoute(
-
-          builder: (_) => page,
-        ),
-      );
-    },
-
-    child: Container(
+    required IconData icon,
+    required String title,
+    required String value,
+    required Color color,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        vertical: 18,
+        horizontal: 12,
+      ),
 
       decoration: BoxDecoration(
-
         color: Colors.white,
-
-        borderRadius:
-            BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(18),
 
         boxShadow: [
-
           BoxShadow(
-
-            color:
-                Colors.black.withOpacity(.05),
-
+            color: Colors.black.withOpacity(.05),
             blurRadius: 8,
-
-            offset:
-                const Offset(0,3),
+            offset: const Offset(0, 3),
           ),
         ],
       ),
 
       child: Column(
-
-        mainAxisAlignment:
-            MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
 
         children: [
-
           CircleAvatar(
-
-            radius: 26,
-
-            backgroundColor:
-                const Color(
-                    0xffFDECEC),
+            radius: 22,
+            backgroundColor: color.withOpacity(.15),
 
             child: Icon(
-
               icon,
-
-              size: 28,
-
-              color:
-                  const Color(
-                      0xffB71C1C),
+              color: color,
+              size: 24,
             ),
           ),
 
           const SizedBox(height: 12),
 
           Text(
-
-            title,
+            value,
 
             style: const TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
 
-              fontWeight:
-                  FontWeight.bold,
-
-              fontSize: 15,
+          const SizedBox(height: 4),
+                    Text(
+            title,
+            style: const TextStyle(
+              color: Colors.black54,
             ),
           ),
         ],
       ),
-    ),
-  );
-}
-
-Color _getStatusColor(
-  String status,
-) {
-
-  switch (status) {
-
-    case "Pending":
-      return Colors.orange;
-
-    case "Diproses":
-      return Colors.blue;
-
-    case "Dikirim":
-    case "Dalam Pengiriman":
-      return Colors.purple;
-
-    case "Selesai":
-      return Colors.green;
-
-    default:
-      return Colors.grey;
+    );
   }
-}
 }

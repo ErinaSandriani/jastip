@@ -5,25 +5,20 @@ header("Access-Control-Allow-Origin: *");
 
 include "db.php";
 
-$sql = "SELECT
-
-id,
-
-nama,
-
-email,
-
-no_hp,
-
-alamat,
-
-tanggal_pulang,
-
-status_verifikasi
-
+$sql = "
+SELECT
+    id,
+    nama,
+    email,
+    no_hp,
+    alamat,
+    tanggal_pulang,
+    status_verifikasi
 FROM users
-
-WHERE role='traveler'";
+WHERE role = 'traveler'
+AND status_verifikasi = 'approved'
+ORDER BY tanggal_pulang ASC
+";
 
 $result = $conn->query($sql);
 
@@ -32,7 +27,6 @@ $data = [];
 if ($result && $result->num_rows > 0) {
 
     while ($row = $result->fetch_assoc()) {
-
         $data[] = $row;
     }
 
@@ -47,4 +41,7 @@ if ($result && $result->num_rows > 0) {
         "status" => "success",
         "data" => []
     ]);
+
 }
+
+$conn->close();

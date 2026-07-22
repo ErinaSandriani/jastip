@@ -25,16 +25,12 @@ class _PesananAdminPageState
   String keyword = "";
 
   final List<String> statusList = [
-
   "Semua",
-
-  "Pending",
-
+  "Menunggu Konfirmasi",
   "Diproses",
-
+  "Dalam Pengiriman",
+  "Menunggu Pelunasan",
   "Selesai",
-
-  "Ditolak",
 ];
 
   @override
@@ -50,24 +46,34 @@ class _PesananAdminPageState
     });
   }
 
-  Color getStatusColor(String status){
-
-  switch(status){
-
-    case "Menunggu Konfirmasi":
+  Color getStatusColor(String status) {
+  switch (status) {
+    case "Menunggu Konfirmasi Admin":
       return Colors.orange;
 
     case "Diproses":
-    case "Dibeli":
-    case "Dalam Perjalanan":
-    case "Dikirim":
       return Colors.blue;
+
+    case "On Hold":
+      return Colors.deepOrange;
+
+    case "Tidak Ditemukan":
+      return Colors.red;
+
+    case "Dalam Pengiriman":
+      return Colors.purple;
+
+    case "Menunggu Pelunasan":
+      return Colors.teal;
+
+    case "Dikirim ke Rumah Customer":
+      return Colors.indigo;
 
     case "Selesai":
       return Colors.green;
 
-    case "Ditolak":
-      return Colors.red;
+    case "Dibatalkan":
+      return Colors.grey;
 
     default:
       return Colors.grey;
@@ -75,28 +81,32 @@ class _PesananAdminPageState
 }
 
 IconData getStatusIcon(String status) {
-
   switch (status) {
-
-    case "Menunggu Konfirmasi":
+    case "Menunggu Konfirmasi Admin":
       return Icons.hourglass_top;
 
     case "Diproses":
       return Icons.settings;
 
-    case "Dibeli":
-      return Icons.shopping_cart;
+    case "On Hold":
+      return Icons.pause_circle;
 
-    case "Dalam Perjalanan":
+    case "Tidak Ditemukan":
+      return Icons.search_off;
+
+    case "Dalam Pengiriman":
       return Icons.flight_takeoff;
 
-    case "Dikirim":
+    case "Menunggu Pelunasan":
+      return Icons.payments;
+
+    case "Dikirim ke Rumah Customer":
       return Icons.local_shipping;
 
     case "Selesai":
       return Icons.check_circle;
 
-    case "Ditolak":
+    case "Dibatalkan":
       return Icons.cancel;
 
     default:
@@ -135,31 +145,35 @@ IconData getStatusIcon(String status) {
       return cocokSearch;
     }
 
-    if(status=="Pending"){
+    if (status == "Menunggu Konfirmasi") {
+  return item.status == "Menunggu Konfirmasi Admin" &&
+      cocokSearch;
+}
 
-      return item.status ==
-              "Menunggu Konfirmasi Admin"
-          && cocokSearch;
-    }
+if (status == "Diproses") {
+  return [
+    "Diproses",
+    "On Hold",
+    "Tidak Ditemukan",
+  ].contains(item.status) &&
+      cocokSearch;
+}
 
-    if(status=="Diproses"){
+if (status == "Dalam Pengiriman") {
+  return item.status == "Dalam Pengiriman" &&
+      cocokSearch;
+}
 
-      return [
+if (status == "Menunggu Pelunasan") {
+  return [
+    "Menunggu Pelunasan",
+    "Menunggu Verifikasi Pelunasan",
+  ].contains(item.status) &&
+      cocokSearch;
+}
 
-        "Diproses",
-
-        "Dibeli",
-
-        "Dalam Pengiriman",
-
-        "Dikirim",
-
-      ].contains(item.status)
-          && cocokSearch;
-    }
-
-    return item.status==status &&
-        cocokSearch;
+return item.status == status &&
+    cocokSearch;
 
   }).toList();
 }
@@ -433,18 +447,14 @@ IconData getStatusIcon(String status) {
                                           children: [
 
                                             Text(
-
-                                              pesanan.namaBarang,
-
-                                              style:
-                                                  const TextStyle(
-
-                                                fontSize: 18,
-
-                                                fontWeight:
-                                                    FontWeight.bold,
-                                              ),
-                                            ),
+  pesanan.namaBarang.isNotEmpty
+      ? pesanan.namaBarang
+      : pesanan.kategori,
+  style: const TextStyle(
+    fontSize: 18,
+    fontWeight: FontWeight.bold,
+  ),
+),
 
                                             const SizedBox(
                                               height: 4,
