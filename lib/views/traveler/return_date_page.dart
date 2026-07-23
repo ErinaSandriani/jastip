@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 
 import '../../viewmodels/auth_viewmodel.dart';
 import '../../viewmodels/traveler_viewmodel.dart';
-import '../../models/traveler_model.dart';
 
 class ReturnDatePage extends StatefulWidget {
   const ReturnDatePage({
@@ -28,31 +27,19 @@ void initState() {
     final auth = context.read<AuthViewModel>();
     final travelerVM = context.read<TravelerViewModel>();
 
-    await travelerVM.getAllTravelers();
+    await travelerVM.getTravelerById(auth.userId!);
 
-    final traveler = travelerVM.travelerList.firstWhere(
-      (e) => e.id == auth.userId,
-      orElse: () => TravelerModel(
-        id: 0,
-        nama: "",
-        email: "",
-        noHp: "",
-        alamat: "",
-        tanggalPulang: "",
-        statusVerifikasi: "",
-      ),
-    );
+    final profile = travelerVM.profileTraveler;
 
-    if (traveler.id != 0 &&
-        traveler.tanggalPulang.isNotEmpty) {
+    if (profile != null &&
+        profile.tanggalPulang.isNotEmpty) {
       setState(() {
-        selectedDate = DateTime.parse(
-          traveler.tanggalPulang,
-        );
+        selectedDate =
+            DateTime.parse(profile.tanggalPulang);
       });
     }
   });
-  }
+}
 
   Future<void> pickDate() async {
 

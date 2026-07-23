@@ -300,6 +300,42 @@ Future<bool> updateStatus(
   }
 }
 
+// ==========================
+  // Reminder Pelunasan
+  // ==========================
+
+  List<Pesanan> get reminderPesanan {
+
+  return pesananList.where((pesanan) {
+
+    if (pesanan.status != "Menunggu Pelunasan") {
+      return false;
+    }
+
+    if (pesanan.deadlinePelunasan.isEmpty) {
+      return false;
+    }
+
+    final sisaHari = getSisaHari(
+      pesanan.deadlinePelunasan,
+    );
+
+    return sisaHari <= 3;
+
+  }).toList();
+}
+
+int getSisaHari(String deadline) {
+
+  if (deadline.isEmpty) {
+    return 999;
+  }
+
+  final batas = DateTime.parse(deadline);
+
+  return batas.difference(DateTime.now()).inDays;
+}
+
   // ======================
   // ASSIGN TRAVELER
   // ======================

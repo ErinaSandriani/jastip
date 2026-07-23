@@ -60,7 +60,7 @@ class TravelerViewModel extends ChangeNotifier {
       final data = jsonDecode(response.body);
 
       if (data["status"] == "success") {
-        await getAllTravelers();
+        await getTravelerById(travelerId);
         return true;
       }
     } catch (e) {
@@ -69,6 +69,36 @@ class TravelerViewModel extends ChangeNotifier {
 
     return false;
   }
+
+  Future<void> getTravelerById(int travelerId) async {
+  isLoading = true;
+  notifyListeners();
+
+  try {
+    final response = await http.get(
+      Uri.parse(
+        "${ApiService.baseUrl}/get_all_travelers.php",
+      ),
+    );
+
+    final data = jsonDecode(response.body);
+
+    if (data["status"] == "success") {
+      travelerList = (data["data"] as List)
+          .map((e) => TravelerModel.fromJson(e))
+          .toList();
+
+      profileTraveler = travelerList.firstWhere(
+        (e) => e.id == travelerId,
+      );
+    }
+  } catch (e) {
+    debugPrint(e.toString());
+  }
+
+  isLoading = false;
+  notifyListeners();
+}
 
   Future<bool> deleteReturnDate(
     int travelerId,
@@ -86,7 +116,7 @@ class TravelerViewModel extends ChangeNotifier {
       final data = jsonDecode(response.body);
 
       if (data["status"] == "success") {
-        await getAllTravelers();
+        await getTravelerById(travelerId);
         return true;
       }
     } catch (e) {

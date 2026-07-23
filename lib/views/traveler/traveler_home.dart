@@ -152,7 +152,7 @@ class _TravelerHomePageState extends State<TravelerHomePage> {
                 children: [
 
                   const Text(
-                    "Selamat Datang 👋",
+                    "Selamat Datang ",
                     style: TextStyle(
                       color: Colors.white70,
                       fontSize: 16,

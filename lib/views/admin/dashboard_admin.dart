@@ -20,11 +20,21 @@ class _DashboardAdminPageState
   void initState() {
     super.initState();
 
-    Future.microtask(() {
-      context
-          .read<DashboardAdminViewModel>()
-          .getDashboard();
-    });
+    Future.microtask(() async {
+
+  final vm =
+      context.read<DashboardAdminViewModel>();
+
+  await vm.getDashboard();
+
+  if (!mounted) return;
+
+  if ((vm.dashboardData?.reminderCount ?? 0) > 0) {
+
+    _showReminderPopup();
+
+  }
+});
   }
 
   Widget buildCard({
@@ -100,6 +110,220 @@ class _DashboardAdminPageState
     );
   }
 
+void _showReminderPopup() {
+
+  showDialog(
+
+    context: context,
+
+    builder: (_) {
+
+      return AlertDialog(
+
+        shape: RoundedRectangleBorder(
+
+          borderRadius:
+              BorderRadius.circular(20),
+
+        ),
+
+        title: const Row(
+
+          children: [
+
+            Icon(
+              Icons.notifications_active,
+              color: Colors.red,
+            ),
+
+            SizedBox(width: 10),
+
+            Text("Pengingat"),
+
+          ],
+
+        ),
+
+        content: const Text(
+
+          "Ada customer yang mendekati deadline pelunasan.",
+
+        ),
+
+        actions: [
+
+          TextButton(
+
+            onPressed: () {
+
+              Navigator.pop(context);
+
+            },
+
+            child: const Text("Nanti"),
+
+          ),
+
+          ElevatedButton(
+
+            onPressed: () {
+
+              Navigator.pop(context);
+
+              _showReminderAdmin();
+
+            },
+
+            child: const Text("Lihat"),
+
+          ),
+
+        ],
+
+      );
+
+    },
+
+  );
+
+}
+
+  void _showReminderAdmin() {
+  final dashboardVM =
+      context.read<DashboardAdminViewModel>();
+
+  final reminder =
+      dashboardVM.dashboardData?.reminder ?? [];
+
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(
+        top: Radius.circular(25),
+      ),
+    ),
+    builder: (_) {
+      return Padding(
+        padding: const EdgeInsets.all(20),
+        child: reminder.isEmpty
+            ? const SizedBox(
+                height: 180,
+                child: Center(
+                  child: Text(
+                    "Tidak ada pengingat pelunasan.",
+                    style: TextStyle(fontSize: 16),
+                  ),
+                ),
+              )
+            : Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
+                children: [
+
+                  const Center(
+                    child: Text(
+                      "Pengingat Pelunasan",
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  Text(
+                    "Ada ${reminder.length} customer mendekati deadline.",
+                    style: const TextStyle(
+                      color: Colors.grey,
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  ListView.separated(
+                    shrinkWrap: true,
+                    physics:
+                        const NeverScrollableScrollPhysics(),
+                    itemCount: reminder.length,
+                    separatorBuilder:
+                        (_, __) =>
+                            const Divider(),
+                    itemBuilder: (_, index) {
+
+                      final item =
+                          reminder[index];
+
+                      Color warna =
+                          Colors.orange;
+
+                      if (item.sisaHari <= 1) {
+                        warna = Colors.red;
+                      }
+
+                      return ListTile(
+
+                        leading: CircleAvatar(
+                          backgroundColor:
+                              warna.withOpacity(.15),
+                          child: Icon(
+                            Icons.notifications,
+                            color: warna,
+                          ),
+                        ),
+
+                        title: Text(
+                          item.customer,
+                          style: const TextStyle(
+                            fontWeight:
+                                FontWeight.bold,
+                          ),
+                        ),
+
+                        subtitle: Column(
+                          crossAxisAlignment:
+                              CrossAxisAlignment
+                                  .start,
+                          children: [
+
+                            const SizedBox(
+                                height: 4),
+
+                            Text(
+                              item.namaBarang,
+                            ),
+
+                            const SizedBox(
+                                height: 4),
+
+                            Text(
+                              "Deadline : ${item.deadlinePelunasan}",
+                            ),
+
+                            Text(
+                              "Sisa ${item.sisaHari} hari",
+                              style: TextStyle(
+                                color: warna,
+                                fontWeight:
+                                    FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+
+                  const SizedBox(height: 20),
+                ],
+              ),
+      );
+    },
+  );
+}
+
   @override
   Widget build(BuildContext context) {
 
@@ -117,27 +341,84 @@ class _DashboardAdminPageState
 
       appBar: AppBar(
 
-        elevation: 0,
+  title: const Text(
+    "Dashboard",
+  ),
 
-        backgroundColor:
-            Colors.white,
+  actions: [
 
-        foregroundColor:
-            Colors.black,
+    Stack(
 
-        centerTitle: true,
+      children: [
 
-        title: const Text(
+        IconButton(
 
-          "Dashboard Admin",
+  icon: const Icon(
+    Icons.notifications_none,
+  ),
 
-          style: TextStyle(
+  onPressed: () {
+    debugPrint("NOTIF DIKLIK");
+    _showReminderAdmin();
+  },
 
-            fontWeight:
-                FontWeight.bold,
+),
+
+        if ((data?.reminderCount ?? 0) > 0)
+
+          Positioned(
+
+            right: 10,
+
+            top: 10,
+
+            child: Container(
+
+              width: 18,
+
+              height: 18,
+
+              decoration:
+                  const BoxDecoration(
+
+                color: Colors.red,
+
+                shape: BoxShape.circle,
+
+              ),
+
+              child: Center(
+
+                child: Text(
+
+                  "${data?.reminderCount ?? 0}",
+
+                  style: const TextStyle(
+
+                    color: Colors.white,
+
+                    fontSize: 10,
+
+                    fontWeight:
+                        FontWeight.bold,
+
+                  ),
+
+                ),
+
+              ),
+
+            ),
+
           ),
-        ),
-      ),
+
+      ],
+
+    ),
+
+  ],
+
+),
 
       body:
           dashboardVM.isLoading

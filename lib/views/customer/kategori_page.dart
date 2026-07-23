@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../viewmodels/pesanan_viewmodel.dart';
 import '../../viewmodels/traveler_viewmodel.dart';
 import 'form_pesanan.dart';
 
@@ -15,22 +16,161 @@ class KategoriPage extends StatefulWidget {
 class _KategoriPageState
     extends State<KategoriPage> {
 
+bool _popupSudahMuncul = false;
+
   @override
   void initState() {
     super.initState();
 
-    Future.microtask(() {
-      context
-          .read<TravelerViewModel>()
-          .getAllTravelers();
-    });
+    Future.microtask(() async {
+
+  await context
+      .read<TravelerViewModel>()
+      .getAllTravelers();
+
+  await context
+      .read<PesananViewModel>()
+      .getPesanan();
+
+});
   }
+
+void _showReminderPopup(
+  BuildContext context,
+  PesananViewModel pesananVM,
+) {
+
+  if (_popupSudahMuncul) return;
+
+  if (pesananVM.reminderPesanan.isEmpty) return;
+
+  _popupSudahMuncul = true;
+
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+
+    final pesanan =
+        pesananVM.reminderPesanan.first;
+
+    final sisaHari =
+        pesananVM.getSisaHari(
+      pesanan.deadlinePelunasan,
+    );
+
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (_) {
+
+        return AlertDialog(
+
+          shape: RoundedRectangleBorder(
+            borderRadius:
+                BorderRadius.circular(20),
+          ),
+
+          title: Row(
+            children: const [
+
+              Icon(
+                Icons.notifications_active,
+                color: Colors.orange,
+              ),
+
+              SizedBox(width: 10),
+
+              Text(
+                "Pengingat Pelunasan",
+              ),
+
+            ],
+          ),
+
+          content: Column(
+            mainAxisSize:
+                MainAxisSize.min,
+
+            crossAxisAlignment:
+                CrossAxisAlignment.start,
+
+            children: [
+
+              Text(
+                pesanan.namaBarang,
+                style: const TextStyle(
+                  fontWeight:
+                      FontWeight.bold,
+                  fontSize: 18,
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              Text(
+                "Deadline : ${pesanan.deadlinePelunasan}",
+              ),
+
+              const SizedBox(height: 8),
+
+              Text(
+                sisaHari < 0
+                    ? "Deadline telah lewat ${-sisaHari} hari"
+                    : "Sisa $sisaHari hari lagi",
+                style: TextStyle(
+                  color: sisaHari < 0
+                      ? Colors.red
+                      : Colors.orange,
+                  fontWeight:
+                      FontWeight.bold,
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              const Text(
+                "Segera lakukan pelunasan agar pesanan dapat diproses.",
+              ),
+            ],
+          ),
+
+          actions: [
+
+            TextButton(
+
+              onPressed: () {
+
+                Navigator.pop(context);
+
+              },
+
+              child: const Text("Tutup"),
+
+            ),
+
+          ],
+
+        );
+
+      },
+
+    );
+
+  });
+
+}
 
   @override
   Widget build(BuildContext context) {
 
     final travelerVM =
         context.watch<TravelerViewModel>();
+
+    final pesananVM =
+    context.watch<PesananViewModel>();
+
+    _showReminderPopup(
+  context,
+  pesananVM,
+);
 
     final categories = [
 
@@ -77,7 +217,7 @@ class _KategoriPageState
 
               const Text(
 
-                "Halo 👋",
+                "Halo",
 
                 style: TextStyle(
 
@@ -89,20 +229,107 @@ class _KategoriPageState
 
               const SizedBox(height:6),
 
-              const Text(
+              Row(
 
-                "Selamat Datang",
+  mainAxisAlignment:
+      MainAxisAlignment.spaceBetween,
 
-                style: TextStyle(
+  children: [
 
-                  fontSize:28,
+    const Text(
 
-                  fontWeight:
-                      FontWeight.bold,
-                ),
+      "Selamat Datang",
+
+      style: TextStyle(
+        fontSize: 28,
+        fontWeight:
+            FontWeight.bold,
+      ),
+
+    ),
+
+    Stack(
+
+      children: [
+
+        IconButton(
+
+          onPressed: () {
+
+            _popupSudahMuncul = false;
+
+            _showReminderPopup(
+              context,
+              pesananVM,
+            );
+
+          },
+
+          icon: const Icon(
+            Icons.notifications_none,
+            size: 32,
+          ),
+
+        ),
+
+        if (pesananVM
+            .reminderPesanan
+            .isNotEmpty)
+
+          Positioned(
+
+            right: 8,
+
+            top: 8,
+
+            child: Container(
+
+              width: 18,
+
+              height: 18,
+
+              decoration:
+                  const BoxDecoration(
+
+                color: Colors.red,
+
+                shape: BoxShape.circle,
+
               ),
 
-              const SizedBox(height:24),
+              child: Center(
+
+                child: Text(
+
+                  "${pesananVM.reminderPesanan.length}",
+
+                  style:
+                      const TextStyle(
+
+                    color: Colors.white,
+
+                    fontSize: 11,
+
+                    fontWeight:
+                        FontWeight.bold,
+
+                  ),
+
+                ),
+
+              ),
+
+            ),
+
+          ),
+
+      ],
+
+    ),
+
+  ],
+
+),
 
               Container(
 
