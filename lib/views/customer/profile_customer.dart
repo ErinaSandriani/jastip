@@ -52,22 +52,119 @@ class ProfileCustomerPage extends StatelessWidget {
 
           children: [
 
-            const CircleAvatar(
+            Stack(
 
-              radius:55,
+  alignment: Alignment.topCenter,
 
-              backgroundColor:
+  children: [
+
+    Column(
+
+      children: [
+
+        const CircleAvatar(
+
+          radius:55,
+
+          backgroundColor:
+              Color(0xffB71C1C),
+
+          child: Icon(
+
+            Icons.person,
+
+            size:58,
+
+            color: Colors.white,
+          ),
+        ),
+
+        const SizedBox(height:18),
+
+        Text(
+
+          auth.namaUser,
+
+          style: const TextStyle(
+
+            fontSize:24,
+
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+
+        const SizedBox(height:6),
+
+        Container(
+
+          padding:
+              const EdgeInsets.symmetric(
+
+            horizontal:18,
+
+            vertical:8,
+          ),
+
+          decoration: BoxDecoration(
+
+            color:
+                const Color(0xffFDECEC),
+
+            borderRadius:
+                BorderRadius.circular(30),
+          ),
+
+          child: Text(
+
+            auth.userRole.toUpperCase(),
+
+            style: const TextStyle(
+
+              color:
                   Color(0xffB71C1C),
 
-              child: Icon(
-
-                Icons.person,
-
-                size:58,
-
-                color: Colors.white,
-              ),
+              fontWeight:
+                  FontWeight.bold,
             ),
+          ),
+        ),
+      ],
+    ),
+
+    Positioned(
+
+      right: 0,
+
+      child: CircleAvatar(
+
+        radius:18,
+
+        backgroundColor:
+            const Color(0xffB71C1C),
+
+        child: IconButton(
+
+          padding: EdgeInsets.zero,
+
+          icon: const Icon(
+
+            Icons.edit_outlined,
+
+            color: Colors.white,
+
+            size:18,
+          ),
+
+          onPressed: () {
+
+            _showEditCustomerDialog(context);
+
+          },
+        ),
+      ),
+    ),
+  ],
+),
 
             const SizedBox(height:18),
 
@@ -403,5 +500,127 @@ const Text(
 ),
 ),
 );
+}
+
+void _showEditCustomerDialog(
+    BuildContext context) {
+
+  final auth =
+      context.read<AuthViewModel>();
+
+  final namaController =
+      TextEditingController(
+
+    text: auth.namaUser,
+
+  );
+
+  showDialog(
+
+    context: context,
+
+    builder: (_) {
+
+      return AlertDialog(
+
+        shape:
+            RoundedRectangleBorder(
+
+          borderRadius:
+              BorderRadius.circular(20),
+        ),
+
+        title: const Text(
+          "Edit Nama",
+        ),
+
+        content: TextField(
+
+          controller:
+              namaController,
+
+          decoration:
+              const InputDecoration(
+
+            labelText: "Nama",
+
+          ),
+        ),
+
+        actions: [
+
+          TextButton(
+
+            onPressed: () {
+
+              Navigator.pop(context);
+
+            },
+
+            child: const Text(
+              "Batal",
+            ),
+          ),
+
+          ElevatedButton(
+
+            style:
+                ElevatedButton.styleFrom(
+
+              backgroundColor:
+                  const Color(
+                      0xffB71C1C),
+
+              foregroundColor:
+                  Colors.white,
+
+            ),
+
+            onPressed: () async {
+
+              final navigator =
+                  Navigator.of(context);
+
+              final messenger =
+                  ScaffoldMessenger.of(
+                      context);
+
+              final success =
+                  await auth.updateProfile(
+
+                nama:
+                    namaController.text,
+
+                noHp:
+                    auth.noHpUser,
+
+              );
+
+              navigator.pop();
+
+              messenger.showSnackBar(
+
+                SnackBar(
+
+                  content: Text(
+
+                    success
+
+                        ? "Profil berhasil diperbarui"
+
+                        : "Gagal memperbarui profil",
+
+                  ),
+                ),
+              );
+            },
+
+            child:
+                const Text("Simpan"),
+          ),
+        ],
+      );
+    },
+  );
 }
 }

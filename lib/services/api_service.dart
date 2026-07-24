@@ -77,4 +77,28 @@ static Future<Map<String, dynamic>> updateKategoriDP({
   return jsonDecode(response.body);
 }
 
+static Future<Map<String, dynamic>> updateProfile({
+  required int userId,
+  required String nama,
+  required String noHp,
+}) async {
+
+  final response = await http.post(
+
+    Uri.parse("$baseUrl/update_profile.php"),
+
+    body: {
+
+      "id": userId.toString(),
+
+      "nama": nama,
+
+      "no_hp": noHp,
+    },
+
+  );
+
+  return jsonDecode(response.body);
+}
+
 }

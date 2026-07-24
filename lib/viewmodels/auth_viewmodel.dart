@@ -19,6 +19,8 @@ class AuthViewModel extends ChangeNotifier {
 
   String emailUser = "";
 
+  String noHpUser = "";
+
   Future<bool> login(
     String email,
     String password,
@@ -63,6 +65,9 @@ class AuthViewModel extends ChangeNotifier {
           emailUser =
               data["user"]["email"] ??
                   email;
+          
+          noHpUser =
+              data["user"]["no_hp"] ?? "";
         }
 
         message = "Login berhasil";
@@ -145,6 +150,49 @@ class AuthViewModel extends ChangeNotifier {
     }
   }
 
+  Future<bool> updateProfile({
+
+  required String nama,
+
+  required String noHp,
+
+}) async {
+
+  if (userId == null) return false;
+
+  try {
+
+    final result =
+        await ApiService.updateProfile(
+
+      userId: userId!,
+
+      nama: nama,
+
+      noHp: noHp,
+
+    );
+
+    if (result["status"] == "success") {
+
+      namaUser = nama;
+
+      noHpUser = noHp;
+
+      notifyListeners();
+
+      return true;
+    }
+
+  } catch (e) {
+
+    debugPrint(e.toString());
+
+  }
+
+  return false;
+}
+
   // ======================
   // LOGOUT
   // ======================
@@ -153,6 +201,7 @@ class AuthViewModel extends ChangeNotifier {
     userId = null;
     namaUser = "";
     emailUser = "";
+    noHpUser = "";
     userRole = "";
     message = "";
 

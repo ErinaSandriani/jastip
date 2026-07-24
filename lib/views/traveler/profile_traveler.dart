@@ -89,25 +89,58 @@ class ProfileTravelerPage extends StatelessWidget {
 
               child: Column(
 
-                children: [
+  children: [
 
-                  const CircleAvatar(
+    Align(
 
-                    radius: 42,
+      alignment: Alignment.topRight,
 
-                    backgroundColor:
-                        Colors.white,
+      child: CircleAvatar(
 
-                    child: Icon(
+        radius: 18,
 
-                      Icons.flight_takeoff,
+        backgroundColor: Colors.white24,
 
-                      color:
-                          Color(0xffB71C1C),
+        child: IconButton(
 
-                      size: 42,
-                    ),
-                  ),
+          padding: EdgeInsets.zero,
+
+          icon: const Icon(
+
+            Icons.edit_outlined,
+
+            color: Colors.white,
+
+            size: 18,
+
+          ),
+
+          tooltip: "Edit Profil",
+
+          onPressed: () {
+
+            _showEditProfileDialog(context);
+
+          },
+        ),
+      ),
+    ),
+
+    const CircleAvatar(
+
+      radius: 42,
+
+      backgroundColor: Colors.white,
+
+      child: Icon(
+
+        Icons.flight_takeoff,
+
+        color: Color(0xffB71C1C),
+
+        size: 42,
+      ),
+    ),
 
                   const SizedBox(height: 18),
 
@@ -175,6 +208,8 @@ class ProfileTravelerPage extends StatelessWidget {
                 ],
               ),
 
+              
+
               child: Column(
 
                 children: [
@@ -235,6 +270,34 @@ class ProfileTravelerPage extends StatelessWidget {
 
                   const Divider(height: 0),
 
+ListTile(
+
+  leading: CircleAvatar(
+
+    backgroundColor: const Color(0xffFDECEC),
+
+    child: const Icon(
+
+      Icons.phone,
+
+      color: Color(0xffB71C1C),
+
+    ),
+  ),
+
+  title: const Text("Nomor HP"),
+
+  subtitle: Text(
+
+    auth.noHpUser.isEmpty
+        ? "-"
+        : auth.noHpUser,
+
+  ),
+),
+
+                  const Divider(height: 0),
+
                   ListTile(
 
                     leading: CircleAvatar(
@@ -265,9 +328,7 @@ class ProfileTravelerPage extends StatelessWidget {
             ),
 
             const SizedBox(height: 30),
-            SizedBox(
-
-  width: double.infinity,
+            SizedBox( 
 
   height: 52,
 
@@ -411,4 +472,152 @@ class ProfileTravelerPage extends StatelessWidget {
       ),
     );
   }
+
+  void _showEditProfileDialog(
+  BuildContext context,
+) {
+
+  final auth =
+      context.read<AuthViewModel>();
+
+  final namaController =
+      TextEditingController(
+    text: auth.namaUser,
+  );
+
+  final hpController =
+      TextEditingController(
+    text: auth.noHpUser,
+  );
+
+  showDialog(
+
+    context: context,
+
+    builder: (_) {
+
+      return AlertDialog(
+
+        shape: RoundedRectangleBorder(
+
+          borderRadius:
+              BorderRadius.circular(20),
+        ),
+
+        title: const Text(
+          "Edit Profil",
+        ),
+
+        content: Column(
+
+          mainAxisSize:
+              MainAxisSize.min,
+
+          children: [
+
+            TextField(
+
+              controller:
+                  namaController,
+
+              decoration:
+                  const InputDecoration(
+
+                labelText: "Nama",
+              ),
+            ),
+
+            const SizedBox(height: 15),
+
+            TextField(
+
+              controller:
+                  hpController,
+
+              keyboardType:
+                  TextInputType.phone,
+
+              decoration:
+                  const InputDecoration(
+
+                labelText: "Nomor HP",
+              ),
+            ),
+          ],
+        ),
+
+        actions: [
+
+          TextButton(
+
+            onPressed: () {
+
+              Navigator.pop(context);
+
+            },
+
+            child:
+                const Text("Batal"),
+          ),
+
+          ElevatedButton(
+
+            style:
+                ElevatedButton.styleFrom(
+
+              backgroundColor:
+                  const Color(
+                      0xffB71C1C),
+
+              foregroundColor:
+                  Colors.white,
+            ),
+
+            onPressed: () async {
+
+              final navigator =
+                  Navigator.of(context);
+
+              final messenger =
+                  ScaffoldMessenger.of(
+                      context);
+
+              final success =
+                  await auth.updateProfile(
+
+                nama:
+                    namaController.text,
+
+                noHp:
+                    hpController.text,
+
+              );
+
+              navigator.pop();
+
+              messenger.showSnackBar(
+
+                SnackBar(
+
+                  content: Text(
+
+                    success
+
+                        ? "Profil berhasil diperbarui"
+
+                        : "Gagal memperbarui profil",
+
+                  ),
+                ),
+              );
+            },
+
+            child:
+                const Text("Simpan"),
+          ),
+        ],
+      );
+    },
+  );
+}
 }
