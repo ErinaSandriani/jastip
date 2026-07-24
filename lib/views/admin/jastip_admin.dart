@@ -3,58 +3,55 @@ import 'package:provider/provider.dart';
 
 import '../../models/traveler_model.dart';
 import '../../viewmodels/traveler_viewmodel.dart';
+import '../../viewmodels/kategori_dp_viewmodel.dart';
+
 import 'detail_traveler_admin.dart';
 
-class TravelerAdminPage extends StatefulWidget {
-
-  const TravelerAdminPage({
-    super.key,
-  });
+class JastipAdminPage extends StatefulWidget {
+  const JastipAdminPage({super.key});
 
   @override
-  State<TravelerAdminPage> createState() =>
-      _TravelerAdminPageState();
+  State<JastipAdminPage> createState() => _JastipAdminPageState();
 }
 
-class _TravelerAdminPageState
-    extends State<TravelerAdminPage> {
+class _JastipAdminPageState extends State<JastipAdminPage>
+    with SingleTickerProviderStateMixin {
 
-  final TextEditingController
-      searchController =
+  late TabController _tabController;
+
+  final TextEditingController searchController =
       TextEditingController();
+  
+  final Map<int, TextEditingController> _dpControllers = {};
 
   String keyword = "";
 
-  final List<String> statusList = [
-
-    "Semua",
-
-    "Pending",
-
-    "Aktif",
-
-    "Ditolak",
-  ];
-
   @override
   void initState() {
-
     super.initState();
 
-    Future.microtask(() {
+    _tabController = TabController(
+      length: 2,
+      vsync: this,
+    );
 
-      context
-          .read<TravelerViewModel>()
-          .getAllTravelers();
+    Future.microtask(() {
+      context.read<TravelerViewModel>().getAllTravelers();
+      context.read<KategoriDPViewModel>().getKategoriDP();
     });
   }
 
-  Color getStatusColor(
-    String status,
-  ) {
+  @override
+void dispose() {
+  for (final controller in _dpControllers.values) {
+    controller.dispose();
+  }
+  super.dispose();
+}
 
-    switch(status){
+  Color getStatusColor(String status) {
 
+        switch (status) {
       case "pending":
         return Colors.orange;
 
@@ -69,12 +66,8 @@ class _TravelerAdminPageState
     }
   }
 
-  String getStatusText(
-    String status,
-  ){
-
-    switch(status){
-
+  String getStatusText(String status) {
+    switch (status) {
       case "pending":
         return "Pending";
 
@@ -89,12 +82,8 @@ class _TravelerAdminPageState
     }
   }
 
-  IconData getStatusIcon(
-    String status,
-  ){
-
-    switch(status){
-
+  IconData getStatusIcon(String status) {
+    switch (status) {
       case "pending":
         return Icons.hourglass_top;
 
@@ -109,222 +98,109 @@ class _TravelerAdminPageState
     }
   }
 
-  List<TravelerModel> filterData(
-
-    List<TravelerModel> data,
-
-    String status,
-
-  ){
-
-    return data.where((item){
-
-      final key =
-          keyword.toLowerCase();
-
-      final cocokSearch =
-
-          item.nama
-              .toLowerCase()
-              .contains(key)
-
-          ||
-
-          item.email
-              .toLowerCase()
-              .contains(key);
-
-      if(status=="Semua"){
-
-        return cocokSearch;
-      }
-
-      if(status=="Pending"){
-
-        return item.statusVerifikasi=="pending"
-
-            && cocokSearch;
-      }
-
-      if(status=="Aktif"){
-
-        return item.statusVerifikasi=="approved"
-
-            && cocokSearch;
-      }
-
-      if(status=="Ditolak"){
-
-        return item.statusVerifikasi=="rejected"
-
-            && cocokSearch;
-      }
-
-      return cocokSearch;
-
-    }).toList();
-  }
-
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
+    final travelerVM = context.watch<TravelerViewModel>();
+    final kategoriDpVM = context.watch<KategoriDPViewModel>();
 
-    final travelerVM =
+    return Scaffold(
 
-        context.watch<
-            TravelerViewModel>();
+            backgroundColor: const Color(0xffF5F5F5),
 
-                return DefaultTabController(
-
-      length: statusList.length,
-
-      child: Scaffold(
-
-        backgroundColor:
-            const Color(0xffF5F5F5),
-
-        appBar: AppBar(
-
-          elevation: 0,
-
-          backgroundColor: Colors.white,
-
-          foregroundColor: Colors.black,
-
-          centerTitle: true,
-
-          title: const Text(
-
-            "Kelola Traveler",
-
-            style: TextStyle(
-
-              fontWeight: FontWeight.bold,
-            ),
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        centerTitle: true,
+        title: const Text(
+          "Jastip",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
           ),
         ),
+        bottom: TabBar(
+          controller: _tabController,
+          labelColor: const Color(0xffB71C1C),
+          unselectedLabelColor: Colors.grey,
+          indicatorColor: const Color(0xffB71C1C),
+          tabs: const [
+            Tab(
+              icon: Icon(Icons.flight_takeoff),
+              text: "Traveler",
+            ),
+            Tab(
+              icon: Icon(Icons.payments),
+              text: "Nominal DP",
+            ),
+          ],
+        ),
+      ),
 
-        body: travelerVM.isLoading
+      body: TabBarView(
+        controller: _tabController,
+        children: [
 
-            ? const Center(
+          /// =========================
+          /// TAB TRAVELER
+          /// =========================
+          travelerVM.isLoading
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : Column(
+                  children: [
 
-                child:
-                    CircularProgressIndicator(),
-              )
-
-            : Column(
-
-                children: [
-
-                  Padding(
-
-                    padding:
-                        const EdgeInsets.all(
-                      16,
-                    ),
-
-                    child: TextField(
-
-                      controller:
-                          searchController,
-
-                      onChanged: (value) {
-
-                        setState(() {
-
-                          keyword = value;
-
-                        });
-                      },
-
-                      decoration:
-                          InputDecoration(
-
-                        hintText:
-                            "Cari nama atau email traveler...",
-
-                        prefixIcon:
-                            const Icon(
-                          Icons.search,
-                        ),
-
-                        filled: true,
-
-                        fillColor:
-                            Colors.white,
-
-                        border:
-                            OutlineInputBorder(
-
-                          borderRadius:
-                              BorderRadius.circular(
-                            16,
+                                        Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: TextField(
+                        controller: searchController,
+                        onChanged: (value) {
+                          setState(() {
+                            keyword = value;
+                          });
+                        },
+                        decoration: InputDecoration(
+                          hintText:
+                              "Cari nama atau email traveler...",
+                          prefixIcon:
+                              const Icon(Icons.search),
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.circular(16),
+                            borderSide: BorderSide.none,
                           ),
-
-                          borderSide:
-                              BorderSide.none,
                         ),
                       ),
                     ),
-                  ),
 
-                  TabBar(
+                    Expanded(
+                      child: Builder(
+                        builder: (context) {
 
-                    isScrollable: true,
+                          final List<TravelerModel> list =
+    travelerVM.travelerList.where(
+                            (traveler) {
+                              return traveler.nama
+                                      .toLowerCase()
+                                      .contains(
+                                        keyword.toLowerCase(),
+                                      ) ||
+                                  traveler.email
+                                      .toLowerCase()
+                                      .contains(
+                                        keyword.toLowerCase(),
+                                      );
+                            },
+                          ).toList();
 
-                    labelColor:
-                        const Color(
-                            0xffB71C1C),
-
-                    unselectedLabelColor:
-                        Colors.grey,
-
-                    indicatorColor:
-                        const Color(
-                            0xffB71C1C),
-
-                    tabs: statusList
-
-                        .map(
-
-                          (e) => Tab(
-                            text: e,
-                          ),
-                        )
-
-                        .toList(),
-                  ),
-
-                  Expanded(
-
-                    child: TabBarView(
-
-                      children:
-
-                          statusList.map(
-
-                        (status){
-
-                          final list =
-
-                              filterData(
-
-                                travelerVM.travelerList,
-
-                                status,
-                              );
-
-                          if(list.isEmpty){
-
+                                                    if (list.isEmpty) {
                             return const Center(
-
                               child: Text(
-
-                                "Tidak ada traveler",
-
+                                "Data traveler tidak ditemukan",
                                 style: TextStyle(
-
                                   fontSize: 16,
-
                                   color: Colors.grey,
                                 ),
                               ),
@@ -332,52 +208,31 @@ class _TravelerAdminPageState
                           }
 
                           return ListView.builder(
+                            padding: const EdgeInsets.all(16),
+                            itemCount: list.length,
+                            itemBuilder: (context, index) {
 
-                            padding:
-                                const EdgeInsets.all(
-                              16,
-                            ),
+                              final traveler = list[index];
 
-                            itemCount:
-                                list.length,
-
-                            itemBuilder:
-
-                                (context,index){
-
-                              final traveler =
-                                  list[index];
-
-                                                                return Container(
-
+                              return Container(
                                 margin: const EdgeInsets.only(
                                   bottom: 18,
                                 ),
-
                                 padding: const EdgeInsets.all(
                                   18,
                                 ),
-
                                 decoration: BoxDecoration(
-
                                   color: Colors.white,
-
                                   borderRadius:
                                       BorderRadius.circular(
                                     22,
                                   ),
-
                                   boxShadow: [
-
                                     BoxShadow(
-
                                       color: Colors.black
                                           .withOpacity(.05),
-
                                       blurRadius: 10,
-
-                                      offset:
-                                          const Offset(
+                                      offset: const Offset(
                                         0,
                                         4,
                                       ),
@@ -386,57 +241,34 @@ class _TravelerAdminPageState
                                 ),
 
                                 child: Column(
-
                                   crossAxisAlignment:
                                       CrossAxisAlignment.start,
-
                                   children: [
 
-                                    Row(
-
+                                                                Row(
                                       children: [
-
                                         const CircleAvatar(
-
                                           radius: 24,
-
                                           backgroundColor:
-                                              Color(
-                                            0xffFDECEC,
-                                          ),
-
+                                              Color(0xffFDECEC),
                                           child: Icon(
-
                                             Icons.flight_takeoff,
-
-                                            color: Color(
-                                              0xffB71C1C,
-                                            ),
+                                            color: Color(0xffB71C1C),
                                           ),
                                         ),
 
-                                        const SizedBox(
-                                          width: 14,
-                                        ),
+                                        const SizedBox(width: 14),
 
                                         Expanded(
-
                                           child: Column(
-
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
-
                                             children: [
-
                                               Text(
-
                                                 traveler.nama,
-
                                                 style:
                                                     const TextStyle(
-
                                                   fontSize: 18,
-
                                                   fontWeight:
                                                       FontWeight.bold,
                                                 ),
@@ -447,12 +279,9 @@ class _TravelerAdminPageState
                                               ),
 
                                               Text(
-
                                                 traveler.email,
-
                                                 style:
                                                     const TextStyle(
-
                                                   color: Colors.grey,
                                                 ),
                                               ),
@@ -461,46 +290,32 @@ class _TravelerAdminPageState
                                         ),
 
                                         Container(
-
                                           padding:
                                               const EdgeInsets.symmetric(
-
                                             horizontal: 12,
-
                                             vertical: 6,
                                           ),
-
-                                          decoration:
-                                              BoxDecoration(
-
-                                            color:
-                                                getStatusColor(
+                                          decoration: BoxDecoration(
+                                            color: getStatusColor(
                                               traveler
                                                   .statusVerifikasi,
                                             ),
-
                                             borderRadius:
                                                 BorderRadius.circular(
                                               20,
                                             ),
                                           ),
-
                                           child: Row(
-
                                             mainAxisSize:
                                                 MainAxisSize.min,
-
                                             children: [
 
-                                              Icon(
-
+                                                                                            Icon(
                                                 getStatusIcon(
                                                   traveler
                                                       .statusVerifikasi,
                                                 ),
-
                                                 color: Colors.white,
-
                                                 size: 16,
                                               ),
 
@@ -509,17 +324,13 @@ class _TravelerAdminPageState
                                               ),
 
                                               Text(
-
                                                 getStatusText(
                                                   traveler
                                                       .statusVerifikasi,
                                                 ),
-
                                                 style:
                                                     const TextStyle(
-
                                                   color: Colors.white,
-
                                                   fontWeight:
                                                       FontWeight.bold,
                                                 ),
@@ -535,31 +346,21 @@ class _TravelerAdminPageState
                                     ),
 
                                     Row(
-
                                       children: [
-
                                         const Icon(
-
                                           Icons.calendar_month,
-
                                           size: 18,
-
                                           color: Colors.grey,
                                         ),
 
-                                        const SizedBox(
-                                          width: 8,
-                                        ),
+                                        const SizedBox(width: 8),
 
                                         Expanded(
-
                                           child: Text(
-
-                                            traveler.tanggalPulang
+                                            traveler
+                                                    .tanggalPulang
                                                     .isEmpty
-
                                                 ? "Belum mengisi tanggal pulang"
-
                                                 : traveler
                                                     .tanggalPulang,
                                           ),
@@ -567,31 +368,22 @@ class _TravelerAdminPageState
                                       ],
                                     ),
 
-                                    const SizedBox(
+                                                                        const SizedBox(
                                       height: 10,
                                     ),
 
                                     Row(
-
                                       children: [
-
                                         const Icon(
-
                                           Icons.phone,
-
                                           size: 18,
-
                                           color: Colors.grey,
                                         ),
 
-                                        const SizedBox(
-                                          width: 8,
-                                        ),
+                                        const SizedBox(width: 8),
 
                                         Expanded(
-
                                           child: Text(
-
                                             traveler.noHp,
                                           ),
                                         ),
@@ -603,60 +395,38 @@ class _TravelerAdminPageState
                                     ),
 
                                     SizedBox(
-
                                       width: double.infinity,
-
                                       height: 48,
-
-                                      child:
-                                          ElevatedButton.icon(
-
+                                      child: ElevatedButton.icon(
                                         style:
                                             ElevatedButton.styleFrom(
-
                                           backgroundColor:
-                                              const Color(
-                                            0xffB71C1C,
-                                          ),
-
+                                              const Color(0xffB71C1C),
                                           foregroundColor:
                                               Colors.white,
-
                                           elevation: 0,
-
                                           shape:
                                               RoundedRectangleBorder(
-
                                             borderRadius:
                                                 BorderRadius.circular(
                                               14,
                                             ),
                                           ),
                                         ),
-
                                         icon: const Icon(
                                           Icons.visibility,
                                         ),
-
                                         label: const Text(
                                           "Lihat Detail",
                                         ),
-
                                         onPressed: () {
-
                                           Navigator.push(
-
                                             context,
-
                                             MaterialPageRoute(
-
                                               builder: (_) =>
-
                                                   DetailTravelerAdmin(
-
-                                                    traveler:
-                                                        traveler,
-                                                  ),
+                                                traveler: traveler,
+                                              ),
                                             ),
                                           );
                                         },
@@ -668,11 +438,126 @@ class _TravelerAdminPageState
                             },
                           );
                         },
-                      ).toList(),
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
+
+                          /// =========================
+          /// TAB NOMINAL DP
+          /// =========================
+          kategoriDpVM.isLoading
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: kategoriDpVM.kategoriDP.length,
+                  itemBuilder: (context, index) {
+
+                    final item =
+                        kategoriDpVM.kategoriDP[index];
+
+                    final controller = _dpControllers.putIfAbsent(
+  item.id,
+  () => TextEditingController(),
+);
+
+if (controller.text != item.nominalDp.toString()) {
+  controller.text = item.nominalDp.toString();
+}
+
+                    return Card(
+                      margin:
+                          const EdgeInsets.only(bottom: 16),
+                      elevation: 2,
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(16),
+                      ),
+                      child: Padding(
+                        padding:
+                            const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment:
+                              CrossAxisAlignment.start,
+                          children: [
+
+                            Text(
+                              item.kategori,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight:
+                                    FontWeight.bold,
+                              ),
+                            ),
+
+                            const SizedBox(height: 16),
+
+                            TextField(
+                              controller: controller,
+                              keyboardType:
+                                  TextInputType.number,
+                              decoration:
+                                  const InputDecoration(
+
+                                                                    labelText: "Nominal DP",
+                                prefixText: "Rp ",
+                                border: OutlineInputBorder(),
+                              ),
+                            ),
+
+                            const SizedBox(height: 16),
+
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                style:
+                                    ElevatedButton.styleFrom(
+                                  backgroundColor:
+                                      const Color(0xffB71C1C),
+                                  foregroundColor:
+                                      Colors.white,
+                                ),
+                                onPressed: () async {
+
+  final messenger = ScaffoldMessenger.of(context);
+
+  final nominal =
+      int.tryParse(controller.text) ?? 0;
+
+  final success =
+      await kategoriDpVM.updateKategoriDP(
+    id: item.id,
+    nominalDp: nominal,
+  );
+
+  controller.text = nominal.toString();
+
+  if (!mounted) return;
+
+  messenger.showSnackBar(
+    SnackBar(
+      content: Text(
+        success
+            ? "Nominal DP berhasil diperbarui"
+            : "Gagal memperbarui Nominal DP",
+      ),
+    ),
+  );
+},
+                                child: const Text(
+                                  "Simpan",
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+        ],
       ),
     );
   }

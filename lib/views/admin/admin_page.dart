@@ -4,7 +4,7 @@ import 'dashboard_admin.dart';
 
 import 'pesanan_admin.dart';
 
-import 'traveler_admin.dart';
+import 'jastip_admin.dart';
 
 import 'profile_admin.dart';
 
@@ -32,7 +32,7 @@ class _AdminPageState
 
     const PesananAdminPage(),
 
-    const TravelerAdminPage(),
+    const JastipAdminPage(),
 
     const ProfileAdminPage(),
   ];
@@ -143,7 +143,7 @@ Widget build(BuildContext context) {
                 Icons.flight_takeoff_rounded,
               ),
 
-              label: "Traveler",
+              label: "Jastip",
             ),
 
             BottomNavigationBarItem(

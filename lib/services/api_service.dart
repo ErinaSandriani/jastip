@@ -49,4 +49,32 @@ class ApiService {
   return jsonDecode(response.body);
 }
 
+static Future<Map<String, dynamic>> getKategoriDP() async {
+
+  final response = await http.get(
+    Uri.parse("$baseUrl/get_kategori_dp.php"),
+  );
+
+  return jsonDecode(response.body);
+}
+
+static Future<Map<String, dynamic>> updateKategoriDP({
+  required int id,
+  required int nominalDp,
+}) async {
+
+  final response = await http.post(
+
+    Uri.parse("$baseUrl/update_kategori_dp.php"),
+
+    body: {
+      "id": id.toString(),
+      "nominal_dp": nominalDp.toString(),
+    },
+
+  );
+
+  return jsonDecode(response.body);
+}
+
 }

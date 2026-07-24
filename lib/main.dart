@@ -8,6 +8,7 @@ import 'viewmodels/dashboard_admin_viewmodel.dart';
 import 'viewmodels/profile_viewmodel.dart';
 import 'viewmodels/traveler_order_viewmodel.dart';
 import 'viewmodels/notification_viewmodel.dart';
+import 'viewmodels/kategori_dp_viewmodel.dart';
 
 import 'views/auth/welcome_page.dart';
 
@@ -52,6 +53,10 @@ class MyApp extends StatelessWidget {
 
         ChangeNotifierProvider(
           create: (_) => NotificationViewModel(),
+        ),
+
+        ChangeNotifierProvider(
+          create: (_) => KategoriDPViewModel(),
         ),
       ],
 

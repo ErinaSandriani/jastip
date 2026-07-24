@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../models/traveler_model.dart';
 import '../../viewmodels/traveler_viewmodel.dart';
 import 'upload_dp_page.dart';
+import '../../viewmodels/kategori_dp_viewmodel.dart';
 
 class FormPesananPage extends StatefulWidget {
   final String kategori;
@@ -53,6 +54,10 @@ class _FormPesananPageState
       context
           .read<TravelerViewModel>()
           .getAllTravelers();
+      
+      context
+    .read<KategoriDPViewModel>()
+    .getKategoriDP();
 
     });
   }
@@ -62,6 +67,9 @@ class _FormPesananPageState
 
     final travelerVM =
         context.watch<TravelerViewModel>();
+    
+    final kategoriDpVM =
+    context.watch<KategoriDPViewModel>();
 
     return Scaffold(
 
@@ -428,23 +436,11 @@ class _FormPesananPageState
                     return;
                   }
 
-                  final nominalDp =
-                      widget.kategori ==
-                              "Fashion"
+final kategori = kategoriDpVM.kategoriDP.firstWhere(
+  (e) => e.kategori == widget.kategori,
+);
 
-                          ? 150000
-
-                          : widget.kategori ==
-                                  "Skincare"
-
-                              ? 100000
-
-                              : widget.kategori ==
-                                      "Merchandise"
-
-                                  ? 75000
-
-                                  : 50000;
+final nominalDp = kategori.nominalDp;
 
                   showDialog(
 

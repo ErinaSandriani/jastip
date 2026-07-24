@@ -44,35 +44,31 @@ if (
     exit;
 }
 
-// DP BERDASARKAN KATEGORI
-$nominal_dp = 50000;
+// AMBIL NOMINAL DP DARI DATABASE
+$stmt = $conn->prepare("
+SELECT nominal_dp
+FROM kategori_dp
+WHERE kategori = ?
+LIMIT 1
+");
 
-switch ($kategori) {
+$stmt->bind_param("s", $kategori);
+$stmt->execute();
 
-    case "Skincare":
+$result = $stmt->get_result();
 
-        $nominal_dp = 100000;
+if ($result->num_rows == 0) {
 
-        break;
-
-    case "Fashion":
-
-        $nominal_dp = 150000;
-
-        break;
-
-    case "Album":
-
-        $nominal_dp = 50000;
-
-        break;
-
-    case "Makanan":
-
-        $nominal_dp = 75000;
-
-        break;
+    echo json_encode([
+        "status" => "error",
+        "message" => "Kategori tidak ditemukan"
+    ]);
+    exit;
 }
+
+$row = $result->fetch_assoc();
+
+$nominal_dp = $row["nominal_dp"];
 
 $status = "Menunggu Konfirmasi Admin";
 
