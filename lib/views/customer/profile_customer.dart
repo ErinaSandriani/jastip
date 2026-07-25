@@ -166,59 +166,6 @@ class ProfileCustomerPage extends StatelessWidget {
   ],
 ),
 
-            const SizedBox(height:18),
-
-            Text(
-
-              auth.namaUser,
-
-              style: const TextStyle(
-
-                fontSize:24,
-
-                fontWeight:
-                    FontWeight.bold,
-              ),
-            ),
-
-            const SizedBox(height:6),
-
-            Container(
-
-              padding:
-                  const EdgeInsets.symmetric(
-
-                horizontal:18,
-
-                vertical:8,
-              ),
-
-              decoration: BoxDecoration(
-
-                color:
-                    const Color(0xffFDECEC),
-
-                borderRadius:
-                    BorderRadius.circular(
-                  30,
-                ),
-              ),
-
-              child: Text(
-
-                auth.userRole.toUpperCase(),
-
-                style: const TextStyle(
-
-                  color:
-                      Color(0xffB71C1C),
-
-                  fontWeight:
-                      FontWeight.bold,
-                ),
-              ),
-            ),
-
             const SizedBox(height:28),
 
             Card(

@@ -77,6 +77,78 @@ static Future<Map<String, dynamic>> updateKategoriDP({
   return jsonDecode(response.body);
 }
 
+static Future<Map<String, dynamic>> getRekening() async {
+
+  final response = await http.get(
+    Uri.parse("$baseUrl/get_rekening.php"),
+  );
+
+  return jsonDecode(response.body);
+
+}
+
+static Future<Map<String, dynamic>> tambahRekening({
+  required String metodePembayaran,
+  required String nomorRekening,
+  required String atasNama,
+}) async {
+
+  final response = await http.post(
+
+    Uri.parse("$baseUrl/tambah_rekening.php"),
+
+    body: {
+      "metode_pembayaran": metodePembayaran,
+      "nomor_rekening": nomorRekening,
+      "atas_nama": atasNama,
+    },
+
+  );
+
+  return jsonDecode(response.body);
+
+}
+
+static Future<Map<String, dynamic>> updateRekening({
+  required int id,
+  required String metodePembayaran,
+  required String nomorRekening,
+  required String atasNama,
+}) async {
+
+  final response = await http.post(
+
+    Uri.parse("$baseUrl/update_rekening.php"),
+
+    body: {
+      "id": id.toString(),
+      "metode_pembayaran": metodePembayaran,
+      "nomor_rekening": nomorRekening,
+      "atas_nama": atasNama,
+    },
+
+  );
+
+  return jsonDecode(response.body);
+
+}
+
+static Future<Map<String, dynamic>> deleteRekening(int id) async {
+
+  final response = await http.post(
+
+    Uri.parse("$baseUrl/delete_rekening.php"),
+
+    body: {
+      "id": id.toString(),
+    },
+
+  );
+
+  return jsonDecode(response.body);
+
+}
+
 static Future<Map<String, dynamic>> updateProfile({
   required int userId,
   required String nama,

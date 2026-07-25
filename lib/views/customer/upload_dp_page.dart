@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import '../../viewmodels/pesanan_viewmodel.dart';
 import '../../viewmodels/auth_viewmodel.dart';
+import '../../viewmodels/rekening_viewmodel.dart';
 
 class UploadDpPage extends StatefulWidget {
 
@@ -43,6 +44,15 @@ class _UploadDpPageState
     extends State<UploadDpPage> {
 
   File? selectedImage;
+
+  @override
+void initState() {
+  super.initState();
+
+  Future.microtask(() {
+    context.read<RekeningViewModel>().getRekening();
+  });
+}
 
   Future<void> pickImage() async {
 
@@ -89,6 +99,13 @@ class _UploadDpPageState
 
     final pesananVM =
         context.watch<PesananViewModel>();
+    
+    final rekeningVM =
+    context.watch<RekeningViewModel>();
+
+    final rekening = rekeningVM.rekening.isNotEmpty
+    ? rekeningVM.rekening.first
+    : null;
 
     final nominalDp =
         widget.kategori == "Fashion"
@@ -246,41 +263,31 @@ class _UploadDpPageState
 
                   const Divider(height:30),
 
-                  const ListTile(
-
-                    contentPadding:
-                        EdgeInsets.zero,
-
-                    leading: CircleAvatar(
-
-                      backgroundColor:
-                          Color(0xffFDECEC),
-
-                      child: Icon(
-
-                        Icons.account_balance,
-
-                        color:
-                            Color(0xffB71C1C),
-                      ),
-                    ),
-
-                    title: Text(
-
-                      "Bank BCA",
-
-                      style: TextStyle(
-
-                        fontWeight:
-                            FontWeight.bold,
-                      ),
-                    ),
-
-                    subtitle: Text(
-
-                      "1234567890\nA/N Aera Aeri Store",
-                    ),
-                  ),
+                  rekening == null
+    ? const Center(
+        child: Text(
+          "Belum ada metode pembayaran",
+        ),
+      )
+    : ListTile(
+        contentPadding: EdgeInsets.zero,
+        leading: const CircleAvatar(
+          backgroundColor: Color(0xffFDECEC),
+          child: Icon(
+            Icons.account_balance,
+            color: Color(0xffB71C1C),
+          ),
+        ),
+        title: Text(
+          rekening.metodePembayaran,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        subtitle: Text(
+          "${rekening.nomorRekening}\nA/N ${rekening.atasNama}",
+        ),
+      ),
                 ],
               ),
             ),
