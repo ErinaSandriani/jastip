@@ -61,7 +61,7 @@ class _KonfirmasiBarangPageState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Konfirmasi Barang"),
+        title: const Text("Konfirmasi Pelunasan"),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),

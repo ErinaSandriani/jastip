@@ -423,7 +423,7 @@ class _RiwayatPesananPageState
             label:
                 const Text(
 
-              "Lihat Detail",
+              "Lacak Pesanan",
             ),
 
             onPressed: () {

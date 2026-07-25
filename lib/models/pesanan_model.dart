@@ -34,6 +34,12 @@ class Pesanan {
 
   final String deadlinePelunasan;
 
+  final int jumlah;
+
+  final String namaPenerima;
+
+  final String nomorHp;
+
   Pesanan({
 
     required this.id,
@@ -69,6 +75,12 @@ class Pesanan {
     required this.nominalDp,
 
     required this.deadlinePelunasan,
+
+    required this.jumlah,
+
+    required this.namaPenerima,
+
+    required this.nomorHp,
   });
 
   factory Pesanan.fromJson(
@@ -138,6 +150,16 @@ class Pesanan {
       deadlinePelunasan:
           json['deadline_pelunasan'] ?? 
               "",
+      
+      jumlah:
+    int.tryParse(json['jumlah'].toString()) ?? 0,
+
+      namaPenerima:
+    json['nama_penerima'] ?? "",
+
+      nomorHp:
+    json['nomor_hp'] ?? "",
+
     );
   }
 }

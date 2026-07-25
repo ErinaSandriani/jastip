@@ -155,6 +155,8 @@ echo json_encode([
 
         "email"=>$user["email"],
 
+        "no_hp"=>$user["no_hp"],
+
         "role"=>$user["role"]
     ]
 ]);

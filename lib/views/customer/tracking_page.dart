@@ -134,6 +134,16 @@ class _TrackingPageState extends State<TrackingPage> {
                 crossAxisAlignment:
                     CrossAxisAlignment.start,
                 children: [
+                
+                const Text(
+  "Detail Pesanan",
+  style: TextStyle(
+    fontSize: 18,
+    fontWeight: FontWeight.bold,
+  ),
+),
+
+const SizedBox(height: 16),
 
                   Row(
                     children: [
@@ -166,23 +176,26 @@ class _TrackingPageState extends State<TrackingPage> {
 
                   const SizedBox(height: 20),
 
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.category,
-                        size: 18,
-                        color: Colors.black54,
-                      ),
+                  Column(
+  children: [
 
-                      const SizedBox(width: 8),
-
-                      Text(
-                        pesanan.kategori,
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 10),
+    Row(
+      children: [
+        const Icon(
+          Icons.category,
+          size: 18,
+          color: Colors.black54,
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            "Kategori : ${pesanan.kategori}",
+          ),
+        ),
+      ],
+    ),
+  ],
+),
 
                   Row(
                     children: [
@@ -202,6 +215,61 @@ class _TrackingPageState extends State<TrackingPage> {
                       ),
                     ],
                   ),
+
+                  const SizedBox(height: 10),
+
+Row(
+  children: [
+    const Icon(
+      Icons.person,
+      size: 18,
+      color: Colors.black54,
+    ),
+    const SizedBox(width: 8),
+    Expanded(
+      child: Text(
+        "Penerima : ${pesanan.namaPenerima}",
+      ),
+    ),
+  ],
+),
+
+const SizedBox(height: 10),
+
+Row(
+  children: [
+    const Icon(
+      Icons.phone,
+      size: 18,
+      color: Colors.black54,
+    ),
+    const SizedBox(width: 8),
+    Expanded(
+      child: Text(
+        "No. HP : ${pesanan.nomorHp}",
+      ),
+    ),
+  ],
+),
+
+const SizedBox(height: 10),
+
+Row(
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+    const Icon(
+      Icons.notes,
+      size: 18,
+      color: Colors.black54,
+    ),
+    const SizedBox(width: 8),
+    Expanded(
+      child: Text(
+        "Catatan : ${pesanan.notes.isEmpty ? "-" : pesanan.notes}",
+      ),
+    ),
+  ],
+),
 
                   const SizedBox(height: 10),
 
