@@ -16,7 +16,6 @@ SELECT
     status_verifikasi
 FROM users
 WHERE role = 'traveler'
-AND status_verifikasi = 'approved'
 ORDER BY tanggal_pulang ASC
 ";
 

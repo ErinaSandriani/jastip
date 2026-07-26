@@ -29,8 +29,9 @@ class _RiwayatPesananPageState
 
   pesananVM.currentUserId = authVM.userId;
 
-  pesananVM.getPesanan();
-
+  pesananVM.getPesanan(
+    userId: authVM.userId,
+  );
 });
   }
 

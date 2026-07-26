@@ -20,31 +20,35 @@ int? currentUserId;
   // ======================
   // GET PESANAN
   // ======================
-  Future<void> getPesanan() async {
-    isLoading = true;
-    notifyListeners();
+  Future<void> getPesanan({int? userId}) async {
+  isLoading = true;
+  notifyListeners();
 
-    try {
-      final response = await http.get(
-  Uri.parse(
-    "${ApiService.baseUrl}/get_orders.php?user_id=$currentUserId",
-  ),
-);
+  try {
+    String url = "${ApiService.baseUrl}/get_orders.php";
 
-      final data = jsonDecode(response.body);
-
-      if (data["status"] == "success") {
-        pesananList = (data["data"] as List)
-            .map((item) => Pesanan.fromJson(item))
-            .toList();
-      }
-    } catch (e) {
-      debugPrint(e.toString());
+    if (userId != null) {
+      url += "?user_id=$userId";
     }
 
-    isLoading = false;
-    notifyListeners();
+    final response = await http.get(
+      Uri.parse(url),
+    );
+
+    final data = jsonDecode(response.body);
+
+    if (data["status"] == "success") {
+      pesananList = (data["data"] as List)
+          .map((item) => Pesanan.fromJson(item))
+          .toList();
+    }
+  } catch (e) {
+    debugPrint(e.toString());
   }
+
+  isLoading = false;
+  notifyListeners();
+}
 
   Future<void> getPesananTraveler(int travelerId) async {
   isLoading = true;
