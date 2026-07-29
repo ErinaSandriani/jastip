@@ -28,6 +28,22 @@ class _LoginPageState
 
   final passwordController =
       TextEditingController();
+  
+  void _showLoading() {
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (_) => const Center(
+      child: CircularProgressIndicator(
+        color: Color(0xffB71C1C),
+      ),
+    ),
+  );
+}
+
+void _hideLoading() {
+  Navigator.of(context, rootNavigator: true).pop();
+}
 
   @override
   Widget build(BuildContext context) {
@@ -194,148 +210,124 @@ const SizedBox(height: 24),
 
             const SizedBox(height: 30),
 
-                        authViewModel.isLoading
+                        SizedBox(
 
-                ? const Center(
-                    child: CircularProgressIndicator(
-                      color: Color(0xffB71C1C),
-                    ),
-                  )
+  width: double.infinity,
 
-                : SizedBox(
+  height: 58,
 
-                    width: double.infinity,
+  child: ElevatedButton(
 
-                    height: 58,
+    style: ElevatedButton.styleFrom(
 
-                    child: ElevatedButton(
+      backgroundColor: const Color(0xffB71C1C),
 
-                      style: ElevatedButton.styleFrom(
+      foregroundColor: Colors.white,
 
-                        backgroundColor:
-                            const Color(0xffB71C1C),
+      elevation: 3,
 
-                        foregroundColor:
-                            Colors.white,
+      shape: RoundedRectangleBorder(
 
-                        elevation: 3,
+        borderRadius: BorderRadius.circular(16),
 
-                        shape:
-                            RoundedRectangleBorder(
+      ),
 
-                          borderRadius:
-                              BorderRadius.circular(
-                                  16),
-                        ),
-                      ),
+    ),
 
-                      onPressed: () async {
+    onPressed: () async {
 
-                        final success =
-                            await authViewModel
-                                .login(
+            _showLoading();
 
-                          emailController.text,
+final success =
+    await authViewModel.login(
 
-                          passwordController
-                              .text,
-                        );
+              emailController.text,
 
-                        if (!mounted) return;
+              passwordController.text,
 
-                        if (success) {
+            );
 
-                          final role =
-                              authViewModel
-                                  .userRole;
+            if (!mounted) return;
 
-                          // CUSTOMER
-                          if (role ==
-                              "customer") {
+_hideLoading();
 
-                            Navigator.pushAndRemoveUntil(
-                             context,
-                             MaterialPageRoute(
-                                  builder: (_) => const CustomerMainPage(),
-                                   ),
-                                  (route) => false,
-                                    );
+            if (success) {
 
-                          // TRAVELER
-                          } else if (
-                              role ==
-                              "traveler") {
+              final role =
+                  authViewModel.userRole;
 
-                            Navigator.pushAndRemoveUntil(
-  context,
-  MaterialPageRoute(
-    builder: (_) => const TravelerHomePage(),
-  ),
-  (route) => false,
-);
+              if (role == "customer") {
 
-                          // ADMIN
-                          } else if (
-                              role ==
-                              "admin") {
-
-                            Navigator.pushAndRemoveUntil(
-  context,
-  MaterialPageRoute(
-    builder: (_) => const AdminPage(),
-  ),
-  (route) => false,
-);
-
-                          } else {
-
-                            ScaffoldMessenger.of(
-                              context,
-                            ).showSnackBar(
-
-                              const SnackBar(
-
-                                content: Text(
-                                  "Role tidak dikenali",
-                                ),
-                              ),
-                            );
-                          }
-
-                        } else {
-
-                          ScaffoldMessenger.of(
-                            context,
-                          ).showSnackBar(
-
-                            SnackBar(
-
-                              content: Text(
-
-                                authViewModel
-                                    .message,
-                              ),
-                            ),
-                          );
-                        }
-                      },
-
-                      child: const Text(
-
-                        "Sign In",
-
-                        style: TextStyle(
-
-                          fontSize: 16,
-
-                          fontWeight:
-                              FontWeight.bold,
-
-                          letterSpacing: .5,
-                        ),
-                      ),
-                    ),
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        const CustomerMainPage(),
                   ),
+                  (route) => false,
+                );
+
+              } else if (role == "traveler") {
+
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        const TravelerHomePage(),
+                  ),
+                  (route) => false,
+                );
+
+              } else if (role == "admin") {
+
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        const AdminPage(),
+                  ),
+                  (route) => false,
+                );
+
+              }
+
+            } else {
+
+              ScaffoldMessenger.of(context)
+                  .showSnackBar(
+
+                SnackBar(
+
+                  content: Text(
+                    authViewModel.message,
+                  ),
+
+                ),
+
+              );
+
+            }
+
+          },
+
+    child: const Text(
+
+  "Sign In",
+
+  style: TextStyle(
+
+    fontSize: 16,
+
+    fontWeight: FontWeight.bold,
+
+    letterSpacing: .5,
+
+  ),
+
+),
+          ),
+
+  ),
 
             const SizedBox(height: 20),
 

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/api_service.dart';
 
@@ -45,10 +46,6 @@ class AuthViewModel extends ChangeNotifier {
 
       final data = jsonDecode(response.body);
 
-      isLoading = false;
-
-      notifyListeners();
-
       if (data["status"] == "success") {
         userRole =
             data["role"] ??
@@ -70,9 +67,21 @@ class AuthViewModel extends ChangeNotifier {
               data["user"]["no_hp"] ?? "";
         }
 
-        message = "Login berhasil";
+        final prefs = await SharedPreferences.getInstance();
 
-        return true;
+await prefs.setInt("userId", userId!);
+
+await prefs.setString("namaUser", namaUser);
+
+await prefs.setString("emailUser", emailUser);
+
+await prefs.setString("noHpUser", noHpUser);
+
+await prefs.setString("userRole", userRole);
+
+message = "Login berhasil";
+
+return true;
       } else {
         message =
             data["message"] ??
@@ -84,15 +93,33 @@ class AuthViewModel extends ChangeNotifier {
       print("ERROR LOGIN:");
       print(e);
 
-      isLoading = false;
-
       message = "Terjadi kesalahan";
 
-      notifyListeners();
-
       return false;
-    }
+    } finally {
+  isLoading = false;
+  notifyListeners();
+}
   }
+
+Future<bool> loadSession() async {
+
+  final prefs = await SharedPreferences.getInstance();
+
+  final id = prefs.getInt("userId");
+
+  if (id == null) return false;
+
+  userId = id;
+  namaUser = prefs.getString("namaUser") ?? "";
+  emailUser = prefs.getString("emailUser") ?? "";
+  noHpUser = prefs.getString("noHpUser") ?? "";
+  userRole = prefs.getString("userRole") ?? "";
+
+  notifyListeners();
+
+  return true;
+}
 
   Future<bool> register(
     String nama,
@@ -197,7 +224,11 @@ class AuthViewModel extends ChangeNotifier {
   // LOGOUT
   // ======================
 
-  void logout() {
+  Future<void> logout() async {
+
+    final prefs = await SharedPreferences.getInstance();
+
+await prefs.clear();
     userId = null;
     namaUser = "";
     emailUser = "";

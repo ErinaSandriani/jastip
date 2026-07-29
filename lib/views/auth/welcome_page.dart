@@ -1,11 +1,69 @@
 import 'package:flutter/material.dart';
 
+import 'package:provider/provider.dart';
+
+import '../../viewmodels/auth_viewmodel.dart';
+import '../customer/customer_main_page.dart';
+import '../traveler/traveler_home.dart';
+import '../admin/admin_page.dart';
+
 import 'register_traveler_page.dart';
 import 'login_page.dart';
 import 'register_page.dart';
 
-class WelcomePage extends StatelessWidget {
+class WelcomePage extends StatefulWidget {
   const WelcomePage({super.key});
+
+  @override
+  State<WelcomePage> createState() => _WelcomePageState();
+}
+
+class _WelcomePageState extends State<WelcomePage> {
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkSession();
+    });
+  }
+
+  Future<void> _checkSession() async {
+
+    final auth = context.read<AuthViewModel>();
+
+    final loggedIn =
+        await auth.loadSession();
+
+    if (!mounted || !loggedIn) return;
+
+    Widget page;
+
+    if (auth.userRole == "customer") {
+
+      page = const CustomerMainPage();
+
+    } else if (auth.userRole == "traveler") {
+
+      page = const TravelerHomePage();
+
+    } else {
+
+      page = const AdminPage();
+
+    }
+
+    Navigator.pushReplacement(
+
+      context,
+
+      MaterialPageRoute(
+        builder: (_) => page,
+      ),
+
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
