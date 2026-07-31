@@ -953,8 +953,8 @@ await showDialog(
     );
   },
 );
-metodeController.dispose();
-nomorController.dispose();
-atasNamaController.dispose();
+//metodeController.dispose();
+//nomorController.dispose();
+//atasNamaController.dispose();
 }
 }

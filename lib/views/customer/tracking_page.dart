@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:file_picker/file_picker.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -23,23 +23,22 @@ class _TrackingPageState extends State<TrackingPage> {
   File? selectedImage;
 
   Future<void> pickImage() async {
-    try {
-      FilePickerResult? result =
-          await FilePicker.platform.pickFiles(
-        type: FileType.image,
-      );
+  try {
+    final ImagePicker picker = ImagePicker();
 
-      if (result != null &&
-          result.files.single.path != null) {
-        setState(() {
-          selectedImage =
-              File(result.files.single.path!);
-        });
-      }
-    } catch (e) {
-      debugPrint(e.toString());
+    final XFile? image = await picker.pickImage(
+      source: ImageSource.gallery,
+    );
+
+    if (image != null) {
+      setState(() {
+        selectedImage = File(image.path);
+      });
     }
+  } catch (e) {
+    debugPrint(e.toString());
   }
+}
 
   Color getStatusColor(String status) {
     switch (status) {

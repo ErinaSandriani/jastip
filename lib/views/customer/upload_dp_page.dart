@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:file_picker/file_picker.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -55,44 +55,30 @@ void initState() {
 }
 
   Future<void> pickImage() async {
+  try {
+    final ImagePicker picker = ImagePicker();
 
-    try {
+    final XFile? image = await picker.pickImage(
+      source: ImageSource.gallery,
+    );
 
-      FilePickerResult? result =
-          await FilePicker.platform.pickFiles(
-
-        type: FileType.image,
-      );
-
-      if (result != null &&
-          result.files.single.path != null) {
-
-        setState(() {
-
-          selectedImage =
-              File(result.files.single.path!);
-
-        });
-      }
-
-    } catch (e) {
-
-      debugPrint(e.toString());
-
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-
-        const SnackBar(
-
-          content: Text(
-            "Gagal memilih file",
-          ),
-        ),
-      );
+    if (image != null) {
+      setState(() {
+        selectedImage = File(image.path);
+      });
     }
+  } catch (e) {
+    debugPrint(e.toString());
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Gagal memilih gambar"),
+      ),
+    );
   }
+}
 
   @override
   Widget build(BuildContext context) {

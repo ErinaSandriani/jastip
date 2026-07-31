@@ -167,6 +167,10 @@ void _showReminderPopup(
     final pesananVM =
     context.watch<PesananViewModel>();
 
+    final approvedTravelers = travelerVM.travelerList
+    .where((e) => e.statusVerifikasi == "approved")
+    .toList();
+
     _showReminderPopup(
   context,
   pesananVM,
@@ -416,14 +420,13 @@ void _showReminderPopup(
                                   Axis.horizontal,
 
                               itemCount:
-                                  travelerVM.travelerList.length,
+    approvedTravelers.length,
 
                               itemBuilder:
                                   (context,index){
 
                                 final traveler =
-                                    travelerVM
-                                        .travelerList[index];
+    approvedTravelers[index];
 
                                 return Container(
 

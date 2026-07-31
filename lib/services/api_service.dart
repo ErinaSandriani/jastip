@@ -12,7 +12,7 @@ class ApiService {
     }
 
     if (Platform.isAndroid) {
-      return "http://192.168.1.8:8000";
+      return "http://192.168.1.9:8000";
     }
 
     if (Platform.isLinux) {

@@ -71,6 +71,10 @@ class _FormPesananPageState
     final kategoriDpVM =
     context.watch<KategoriDPViewModel>();
 
+    final approvedTravelers = travelerVM.travelerList
+    .where((e) => e.statusVerifikasi == "approved")
+    .toList();
+
     return Scaffold(
 
       backgroundColor:
@@ -302,8 +306,8 @@ class _FormPesananPageState
               ),
 
               items:
-                  travelerVM.travelerList
-                      .map(
+    approvedTravelers
+        .map(
 
                 (traveler){
 

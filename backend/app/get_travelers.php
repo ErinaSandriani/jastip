@@ -20,7 +20,9 @@ status_verifikasi
 
 FROM users
 
-WHERE role='traveler'";
+WHERE role='traveler' 
+
+AND status_verifikasi = 'approved'";
 
 $result = $conn->query($sql);
 

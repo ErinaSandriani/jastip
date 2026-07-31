@@ -43,30 +43,33 @@ void initState() {
 
   Future<void> pickDate() async {
 
-    final picked = await showDatePicker(
+  final now = DateTime.now();
 
-      context: context,
+  final today = DateTime(
+    now.year,
+    now.month,
+    now.day,
+  );
 
-      initialDate:
-          selectedDate ??
-              DateTime.now(),
+  final initial =
+      (selectedDate != null &&
+              !selectedDate!.isBefore(today))
+          ? selectedDate!
+          : today;
 
-      firstDate:
-          DateTime.now(),
+  final picked = await showDatePicker(
+    context: context,
+    initialDate: initial,
+    firstDate: today,
+    lastDate: DateTime(2035),
+  );
 
-      lastDate:
-          DateTime(2035),
-    );
-
-    if (picked != null) {
-
-      setState(() {
-
-        selectedDate = picked;
-
-      });
-    }
+  if (picked != null) {
+    setState(() {
+      selectedDate = picked;
+    });
   }
+}
 
   @override
   Widget build(BuildContext context) {
